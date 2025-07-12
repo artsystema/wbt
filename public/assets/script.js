@@ -1,0 +1,448 @@
+document.addEventListener("DOMContentLoaded", () => {
+
+    fetch("/wbt/api/reset_expired.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "global_reset=1"
+    });
+
+    let passcode = localStorage.getItem("passcode") || "";
+    const authField = document.getElementById("authField");
+    const authBtn = document.getElementById("authBtn");
+    const authStatus = document.getElementById("authStatus");
+    const historyBtn = document.getElementById("historyBtn");
+    const taskList = document.getElementById("taskList");
+    const taskListCompleted = document.getElementById("taskListCompleted");
+    const bankDisplay = document.getElementById("bankDisplay");
+
+    function updateAuthDisplay() {
+        if (passcode) {
+            authField.style.display = "none";
+            authBtn.style.display = "none";
+            authStatus.innerHTML = `Authorized as [<strong>${passcode}</strong>] <button id="deauthBtn">Exit</button>`;
+            //historyBtn.style.display = "inline";
+
+            document.getElementById("deauthBtn").addEventListener("click", () => {
+                localStorage.removeItem("passcode");
+                passcode = "";
+                authField.value = "";
+                updateAuthDisplay();
+            });
+
+            fetch(`/wbt/api/user_stats.php?passcode=${encodeURIComponent(passcode)}`)
+                .then(res => res.json())
+                .then(stats => {
+                    const parts = [];
+
+                    //if (stats.paid_out > 0) parts.push(`[paid out: $${stats.paid_out}]`);
+                    //if (stats.pending > 0) parts.push(`[pending: $${stats.pending}]`);
+
+                    if (stats.active_jobs > 0 || stats.submitted_jobs > 0 || stats.completed_jobs > 0) {
+                        const jobParts = [];
+                        if (stats.active_jobs > 0) jobParts.push(`<span class="user-metric clickable" data-filter="active" title="Active jobs"><strong style="color:blue;">${stats.active_jobs}</strong></span>`);
+                        if (stats.submitted_jobs > 0) jobParts.push(`<span class="user-metric clickable" data-filter="submitted" title="Pending review jobs"><strong style="color:#fbba00;">${stats.submitted_jobs}</strong></span>`);
+                        if (stats.completed_jobs > 0) jobParts.push(`<span class="user-metric clickable" data-filter="completed" title="Completed jobs"><strong style="color:green;">${stats.completed_jobs}</strong></span>`);
+                        parts.push(`[jobs: ${jobParts.join("|")}]`);
+                    }
+
+
+
+
+                    if (stats.last_submission) parts.push(`[last: ${new Date(stats.last_submission).toLocaleString()}]`);
+
+                    const userMeta = parts.length ? `<span class="user-meta"> ${parts.join('')} </span>` : '';
+                    authStatus.innerHTML = `Authorized as [<strong>${passcode}</strong>]${userMeta} <button id="deauthBtn">Exit</button>`;
+
+                    document.querySelectorAll('.user-metric.clickable').forEach(el => {
+                        el.addEventListener('click', () => {
+                            const filter = el.dataset.filter;
+                            document.querySelectorAll("#taskList .task").forEach(div => {
+                                const mine = div.dataset.owner === passcode;
+                                const status = div.dataset.status;
+
+                                let show = true;
+                                if (filter === "active") show = mine && status === "in_progress";
+                                if (filter === "completed") show = mine && status === "completed";
+                                div.style.display = show ? "" : "none";
+                            });
+                        });
+                    });
+
+                    document.getElementById("deauthBtn").addEventListener("click", () => {
+                        localStorage.removeItem("passcode");
+                        passcode = "";
+                        authField.value = "";
+                        updateAuthDisplay();
+                    });
+                });
+
+
+
+
+
+
+        } else {
+            authField.style.display = "inline";
+            authBtn.style.display = "inline";
+            authStatus.innerHTML = "";
+            historyBtn.style.display = "none";
+        }
+    }
+
+    authBtn.addEventListener("click", () => {
+        const val = authField.value.trim();
+        if (!val) return alert("Enter a passcode first.");
+        passcode = val;
+        localStorage.setItem("passcode", passcode);
+        updateAuthDisplay();
+    });
+
+    updateAuthDisplay();
+
+
+
+
+
+    fetch("/wbt/api/tasks.php")
+        .then(res => res.json())
+        .then(tasks => {
+            taskList.innerHTML = "";
+
+            const header = document.createElement("div");
+            header.className = "task header";
+            header.innerHTML = `     
+                <div>Title</div>
+                <div>Description</div>
+                <div>Time</div>
+                <div>Reward</div>
+                <div>Status</div>
+                <div>Action</div>
+            `;
+            taskList.appendChild(header);
+
+            if (tasks.length === 0) {
+                const emptyRow = document.createElement("div");
+                emptyRow.className = "task";
+                emptyRow.innerHTML = "<div>No tasks available</div>";
+                taskList.appendChild(emptyRow);
+                return;
+            }
+
+            let availableCount = 0;
+            let inProgressCount = 0;
+
+            const activeJobs = [];
+            const completedJobs = [];
+
+            tasks.forEach(task => {
+                if (task.status === "available") availableCount++;
+                if (task.status === "in_progress") inProgressCount++;
+
+                if (task.status === "completed") {
+                    completedJobs.push(task);
+                } else {
+                    activeJobs.push(task);
+                }
+            });
+
+            document.getElementById("taskStats").innerHTML = `[<span style="color:green;"><strong>${availableCount}</strong></span> available, ${inProgressCount} in progress]`;
+
+            tasks.forEach(task => {
+                //if (task.status === "completed") return;
+
+                const div = document.createElement("div");
+                div.className = "task";
+                div.dataset.id = task.id;
+                div.className = `task ${task.status}`;
+
+                const isOwner = passcode && passcode === task.assigned_to;
+                const isInProgress = task.status === "in_progress";
+
+                let statusDisplay = task.status;
+                let actionHTML = "";
+
+                if (task.status === "in_progress") {
+                    if (isOwner && task.start_time) {
+                        const countdown = document.createElement("span");
+                        countdown.className = "countdown";
+                        const endTime = new Date(task.start_time).getTime() + task.estimated_minutes * 60000;
+                        const estimatedMs = task.estimated_minutes * 60000;
+
+                        countdown.dataset.end = new Date(endTime).toISOString();
+                        countdown.dataset.estimatedMs = estimatedMs;
+                        statusDisplay = countdown.outerHTML;
+                        //statusDisplay = "<span>pending review</span>";
+                    } else {
+                        statusDisplay = "<span>in progress</span>";
+                    }
+                }
+
+                if (!isInProgress) {
+                    //actionHTML = `<button data-id="${task.id}">Take</button>`;
+                    if (task.status === "available") {
+                        actionHTML = `<button data-id="${task.id}">Take</button>`;
+                    }
+                } else if (isOwner) {
+                    actionHTML = `<form class="uploadForm" data-id="${task.id}" enctype="multipart/form-data" style="display:inline;">
+	          <input type="file" name="attachment" required />
+	          <button type="submit">Submit</button>
+              </form>
+              <button class="quitBtn" data-id="${task.id}">Quit</button>
+              `;
+                }
+
+                div.innerHTML = `
+           
+          <div>
+            <div><strong>[${task.id}] ${task.title}</strong></div>
+            <div class="task-meta">Posted on ${new Date(task.date_posted).toLocaleString()}</div>
+            <span class="task-category">${task.category || ''}</span>
+          </div>
+          <div>
+  ${task.description}
+  ${
+                    task.attachments && Array.isArray(task.attachments) && task.attachments.length > 0
+                        ? `<div class="attachments"><strong>Attachments:</strong><ul>` +
+                    (task.attachments || []).map(file => {
+                        const name = file.split("/").pop();
+                        const ext = name.split('.').pop().toLowerCase();
+                        const supported = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mp3', 'txt'];
+
+                        const safeId = `preview-${task.id}-${name.replace(/[^a-z0-9]/gi, '_')}`;
+                        let previewBtn = '';
+                        let previewContainer = '';
+
+                        if (supported.includes(ext)) {
+                            previewBtn = `<button type="button" class="preview-toggle" data-src="${file}" data-type="${ext}" data-target="${safeId}">Preview</button>`;
+                            previewContainer = `<div class="preview-container" id="${safeId}" style="display:none;"></div>`;
+                        }
+
+                        return `<li>
+        <a href="${file}" target="_blank">${name}</a>
+        ${previewBtn}
+        ${previewContainer}
+    </li>`;
+                    }).join("") +`</ul></div>`  : ""}
+</div>
+          <div>${formatTime(task.estimated_minutes)}</div>
+          <div>$${task.reward}</div>
+          <div>${statusDisplay}</div>
+          <div>${actionHTML}</div>
+        `
+                div.querySelectorAll(".preview-toggle").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        const container = div.querySelector(`#${btn.dataset.target}`);
+                        const src = btn.dataset.src;
+                        const type = btn.dataset.type;
+
+                        const isOpen = container.style.display === "block";
+                        container.style.display = isOpen ? "none" : "block";
+                        btn.textContent = isOpen ? "Preview" : "Hide";
+
+                        if (isOpen || container.innerHTML.trim()) return; // Already shown
+
+                        let html = '';
+                        if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(type)) {
+                            html = `<img src="${src}" style="max-width:100%; max-height:300px;">`;
+                        } else if (type === 'mp4') {
+                            html = `<video src="${src}" controls style="max-width:100%; max-height:300px;"></video>`;
+                        } else if (type === 'mp3') {
+                            html = `<audio src="${src}" controls></audio>`;
+                        } else if (type === 'txt') {
+                            fetch(src).then(res => res.text()).then(text => {
+                                container.innerHTML = `<pre style="white-space: pre-wrap; overflow:auto;">${text}</pre>`;
+                            });
+                            return;
+                        }
+
+                        container.innerHTML = html;
+                    });
+                });
+
+
+
+                    ;
+
+                if (!isInProgress) {
+                    const btn = div.querySelector("button");
+                    const takeBtn = Array.from(div.querySelectorAll("button")).find(b => b.textContent === "Take");
+                    if (takeBtn) {
+                        takeBtn.addEventListener("click", (e) => {
+                            e.stopPropagation();
+                            if (!passcode) return alert("Enter passcode first.");
+                            fetch("/wbt/api/tasks.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ task_id: task.id, passcode })
+                            })
+                                .then(res => res.json())
+                                .then(result => {
+                                    if (result.success) location.reload();
+                                    else alert("Error: " + (result.error || "Unknown"));
+                                });
+                        });
+                    }
+
+                }
+
+                const form = div.querySelector(".uploadForm");
+                if (form) {
+                    form.addEventListener("submit", e => {
+                        e.preventDefault();
+                        const fileInput = form.querySelector("input[name=attachment]");
+                        const formData = new FormData();
+                        formData.append("attachment", fileInput.files[0]);
+                        formData.append("task_id", task.id);
+                        formData.append("passcode", passcode);
+
+                        fetch("/wbt/api/submit.php", {
+                            method: "POST",
+                            body: formData
+                        })
+                            .then(res => res.json())
+                            .then(result => {
+                                if (result.success) {
+                                    alert("Submitted successfully!");
+                                    location.reload();
+                                } else {
+                                    alert("Upload failed: " + (result.error || "Unknown"));
+                                }
+                            });
+                    });
+
+                    const quitBtn = div.querySelector(".quitBtn");
+                    if (quitBtn) {
+                        quitBtn.addEventListener("click", () => {
+                            if (!confirm("Are you sure you want to quit this task?")) return;
+                            fetch("/wbt/api/quit_task.php", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ task_id: task.id, passcode })
+                            })
+                                .then(res => res.json())
+                                .then(result => {
+                                    if (result.success) {
+                                        alert("Task has been quit and relisted.");
+                                        location.reload();
+                                    } else {
+                                        alert("Error: " + (result.error || "Unknown"));
+                                    }
+                                });
+                        });
+                    }
+
+                }
+
+
+                if (div.classList.contains('completed')) {
+                    taskListCompleted.appendChild(div);
+                    taskListCompleted.style.display = "block";
+                } else {
+                    taskList.appendChild(div);
+                }
+
+
+
+            });
+        });
+
+    fetch("/wbt/api/fund.php")
+        .then(res => res.json())
+        .then(bank => {
+            const text = `$${bank.available} available`;
+            const reserved = bank.reserved > 0 ? ` ($${bank.reserved} reserved)` : '';
+            bankDisplay.textContent = text + reserved;
+        });
+
+
+    function getFileIcon(file) {
+        const ext = file.split('.').pop().toLowerCase();
+        const known = ['pdf', 'jpg', 'png', 'zip', 'docx', 'txt', 'csv', 'mp4', 'wav', 'ai', 'psd', 'blend', 'obj'];
+        return `/wbt/assets/icons/filetypes/${known.includes(ext) ? ext : 'default'}.png`;
+    }
+
+    function updateCountdowns() {
+        document.querySelectorAll(".countdown").forEach(el => {
+            const end = new Date(el.dataset.end);
+            const now = new Date();
+            const diff = end - now;
+            const container = el.closest(".task");
+            const taskId = container ?.dataset.id;
+            const estimatedMinutes = parseFloat(el.dataset.estimated || "0");
+            const estimatedMs = parseFloat(el.dataset.estimatedMs);
+            if (isNaN(diff) || diff <= 0) {
+                el.textContent = "Expired";
+
+                if (!el.dataset.reset && taskId && passcode) {
+                    el.dataset.reset = "true";
+                    fetch("/wbt/api/reset_expired.php", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `task_id=${taskId}&passcode=${encodeURIComponent(passcode)}`
+                    })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.success) location.reload();
+                        });
+                }
+            } else {
+                const mins = diff / 60000;
+
+                const total = estimatedMs / 1000;
+                const elapsed = total - diff / 1000;
+                //console.log(elapsed);
+                const progressRatio = Math.max(0, Math.min(1, elapsed / total));
+                const barSegments = 20;
+                const filledSegments = Math.round(barSegments * progressRatio);
+                const stripes = Array.from({ length: filledSegments }, () => '<div></div>').join("");
+
+                el.innerHTML = `
+                <div class="progress-bar">
+                    <div class="progress-stripe">${stripes}</div>
+                </div>in progress <br> [${formatTime(mins, true)}]
+            `;
+            }
+        });
+    }
+
+
+    setInterval(updateCountdowns, 1000);
+    updateCountdowns();
+
+
+    setInterval(() => {
+        fetch("/wbt/api/reset_expired.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "global_reset=true"
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && result.reset > 0) {
+                    console.log(`Reset ${result.reset} expired tasks`);
+                    location.reload(); // or optionally just refresh task list
+                }
+            })
+            .catch(err => console.error("Global reset failed", err));
+    }, 10000);
+
+    function formatTime(minutes, includeSeconds = false) {
+        const totalMs = minutes * 60 * 1000;
+        const mins = Math.floor(totalMs / 60000);
+        const secs = Math.floor((totalMs % 60000) / 1000);
+        const hrs = Math.floor(mins / 60);
+        const remMins = mins % 60;
+
+        if (includeSeconds) {
+            if (hrs > 0) return `${hrs}h ${remMins}m ${secs}s`;
+            if (remMins > 0) return `${remMins}m ${secs}s`;
+            return `${secs}s`;
+        } else {
+            if (hrs > 0 && remMins > 0) return `${hrs}h ${remMins}m`;
+            if (hrs > 0) return `${hrs}h`;
+            return `${remMins}m`;
+        }
+    }
+});
