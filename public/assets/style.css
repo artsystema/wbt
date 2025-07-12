@@ -149,6 +149,7 @@ div#taskListCompleted {
     font-size: 0.75em;
     color: #4466aa;
     font-style: italic;
+    cursor: pointer;
 }
 
 #taskList .header {
@@ -257,6 +258,26 @@ span > strong {
 }
 span > strong:hover {
     text-decoration: underline;
+}
+
+#activeFilters {
+    margin: 40px 0 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn,
+.filter-reset {
+    padding: 2px 6px;
+    background: #eee;
+    border: 1px solid #999;
+    cursor: pointer;
+}
+
+.filter-btn:hover,
+.filter-reset:hover {
+    background: #ddd;
 }
 
 
