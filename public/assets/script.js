@@ -211,6 +211,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const isOwner = passcode && passcode === task.assigned_to;
                 const isInProgress = task.status === "in_progress";
+                const isPending = task.status === "pending_review";
 
                 let statusDisplay = task.status;
                 let actionHTML = "";
@@ -232,9 +233,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 if (!isInProgress) {
-                    //actionHTML = `<button data-id="${task.id}">Take</button>`;
                     if (task.status === "available") {
                         actionHTML = `<button data-id="${task.id}">Take</button>`;
+                    } else if (isPending && isOwner && task.comment) {
+                        actionHTML = `<em class="task-comment">${escapeHtml(task.comment)}</em>`;
                     }
                 } else if (isOwner) {
                     actionHTML = `<form class="uploadForm" data-id="${task.id}" enctype="multipart/form-data" style="display:inline;">
@@ -495,6 +497,15 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(err => console.error("Global reset failed", err));
     }, 10000);
+
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
     function formatTime(minutes, includeSeconds = false) {
         const totalMs = minutes * 60 * 1000;

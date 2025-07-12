@@ -23,6 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
         $task['attachments'] = $attachments;
+
+        if ($task['status'] === 'pending_review') {
+            $stmtSub = $pdo->prepare("SELECT comment FROM submissions WHERE task_id = ? ORDER BY submitted_at DESC LIMIT 1");
+            $stmtSub->execute([$task['id']]);
+            $task['comment'] = $stmtSub->fetchColumn() ?: '';
+        }
     }
 
     echo json_encode($tasks);
