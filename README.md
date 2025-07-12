@@ -45,6 +45,11 @@ connection logic are found in `db/`.
    ```
 5. Navigate to `http://localhost:8000/` to view the task list. The admin panel is
    available at `http://localhost:8000/admin.php`.
+6. The `tasks` table now includes a `category` column. If upgrading an existing
+   installation run:
+   ```sql
+   ALTER TABLE tasks ADD COLUMN category VARCHAR(255);
+   ```
 
 ## Expired Task Reset
 

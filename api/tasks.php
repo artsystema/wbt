@@ -9,7 +9,7 @@ require_once __DIR__ . '/../db/db.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $pdo->query("SELECT * FROM tasks ORDER BY date_posted DESC");
+    $stmt = $pdo->query("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks ORDER BY date_posted DESC");
     $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($tasks as &$task) {

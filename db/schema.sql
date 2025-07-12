@@ -12,6 +12,7 @@ CREATE TABLE tasks (
   title VARCHAR(255),
   description TEXT,
   links TEXT,
+  category VARCHAR(255),
   attachments TEXT,
   reward DECIMAL(10,2),
   estimated_minutes INT,
