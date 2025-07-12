@@ -239,14 +239,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else if (isOwner) {
                     actionHTML = `<form class="uploadForm" data-id="${task.id}" enctype="multipart/form-data" style="display:inline;">
                   <input type="file" name="attachment" required />
-                  <input type="text" name="comment" placeholder="Note (optional)" class="noteField" />
                   <button type="submit">Submit</button>
               </form>
               <form class="quitForm" data-id="${task.id}" style="display:inline;">
-                  <input type="text" name="comment" placeholder="Note (optional)" class="noteField" />
                   <button type="submit" class="quitBtn">Quit</button>
               </form>
-              `;
+              <input type="text" placeholder="Note (optional)" class="noteField" />`;
                 }
 
                 div.innerHTML = `
@@ -352,12 +350,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     form.addEventListener("submit", e => {
                         e.preventDefault();
                         const fileInput = form.querySelector("input[name=attachment]");
-                        const commentInput = form.querySelector("input[name=comment]");
+                        const noteField = div.querySelector(".noteField");
                         const formData = new FormData();
                         formData.append("attachment", fileInput.files[0]);
                         formData.append("task_id", task.id);
                         formData.append("passcode", passcode);
-                        if (commentInput) formData.append("comment", commentInput.value);
+                        if (noteField) formData.append("comment", noteField.value);
 
                         fetch("/wbt/api/submit.php", {
                             method: "POST",
@@ -379,7 +377,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         quitForm.addEventListener("submit", e => {
                             e.preventDefault();
                             if (!confirm("Are you sure you want to quit this task?")) return;
-                            const comment = quitForm.querySelector("input[name=comment]").value;
+                            const noteField = div.querySelector(".noteField");
+                            const comment = noteField ? noteField.value : "";
                             fetch("/wbt/api/quit_task.php", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
