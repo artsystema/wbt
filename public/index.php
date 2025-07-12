@@ -26,6 +26,8 @@
   </div>
 </div>
 
+  <div id="activeFilters"></div>
+
   <div id="taskList">Loading tasks...</div>
   <div id="taskListCompleted"></div>
 

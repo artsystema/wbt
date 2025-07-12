@@ -14,6 +14,64 @@ document.addEventListener("DOMContentLoaded", () => {
     const taskList = document.getElementById("taskList");
     const taskListCompleted = document.getElementById("taskListCompleted");
     const bankDisplay = document.getElementById("bankDisplay");
+    const filterStack = document.getElementById("activeFilters");
+    const filters = [];
+    renderFilters();
+
+    function renderFilters() {
+        filterStack.innerHTML = "";
+        filters.forEach((f, i) => {
+            const btn = document.createElement("button");
+            btn.className = "filter-btn";
+            btn.textContent = `${f.label} X`;
+            btn.addEventListener("click", () => removeFilter(i));
+            filterStack.appendChild(btn);
+        });
+        if (filters.length >= 2) {
+            const reset = document.createElement("button");
+            reset.className = "filter-reset";
+            reset.textContent = "Reset";
+            reset.addEventListener("click", () => {
+                filters.length = 0;
+                applyFilters();
+                renderFilters();
+            });
+            filterStack.appendChild(reset);
+        }
+    }
+
+    function applyFilters() {
+        document.querySelectorAll('#taskList .task, #taskListCompleted .task').forEach(div => {
+            if (div.classList.contains('header')) return;
+            let show = true;
+            filters.forEach(f => {
+                if (f.type === 'category') {
+                    const cat = div.dataset.category || '';
+                    if (cat !== f.value) show = false;
+                } else if (f.type === 'my') {
+                    const owner = div.dataset.owner;
+                    const status = div.dataset.status;
+                    if (f.value === 'active' && !(owner === passcode && status === 'in_progress')) show = false;
+                    if (f.value === 'submitted' && !(owner === passcode && status === 'pending_review')) show = false;
+                    if (f.value === 'completed' && !(owner === passcode && status === 'completed')) show = false;
+                }
+            });
+            div.style.display = show ? '' : 'none';
+        });
+    }
+
+    function addFilter(type, value, label) {
+        if (filters.some(f => f.type === type && f.value === value)) return;
+        filters.push({ type, value, label });
+        applyFilters();
+        renderFilters();
+    }
+
+    function removeFilter(idx) {
+        filters.splice(idx, 1);
+        applyFilters();
+        renderFilters();
+    }
 
     function updateAuthDisplay() {
         if (passcode) {
@@ -56,15 +114,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.querySelectorAll('.user-metric.clickable').forEach(el => {
                         el.addEventListener('click', () => {
                             const filter = el.dataset.filter;
-                            document.querySelectorAll("#taskList .task").forEach(div => {
-                                const mine = div.dataset.owner === passcode;
-                                const status = div.dataset.status;
-
-                                let show = true;
-                                if (filter === "active") show = mine && status === "in_progress";
-                                if (filter === "completed") show = mine && status === "completed";
-                                div.style.display = show ? "" : "none";
-                            });
+                            const label = `My ${filter}`;
+                            addFilter('my', filter, label);
                         });
                     });
 
@@ -154,6 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 div.className = "task";
                 div.dataset.id = task.id;
                 div.className = `task ${task.status}`;
+                div.dataset.owner = task.assigned_to || '';
+                div.dataset.status = task.status;
+                div.dataset.category = task.category || '';
 
                 const isOwner = passcode && passcode === task.assigned_to;
                 const isInProgress = task.status === "in_progress";
@@ -228,7 +282,15 @@ document.addEventListener("DOMContentLoaded", () => {
           <div>$${task.reward}</div>
           <div>${statusDisplay}</div>
           <div>${actionHTML}</div>
-        `
+          `;
+                const cat = div.querySelector('.task-category');
+                if (cat && cat.textContent.trim()) {
+                    cat.classList.add('clickable');
+                    cat.addEventListener('click', () => {
+                        addFilter('category', cat.textContent.trim(), cat.textContent.trim());
+                    });
+                }
+
                 div.querySelectorAll(".preview-toggle").forEach(btn => {
                     btn.addEventListener("click", () => {
                         const container = div.querySelector(`#${btn.dataset.target}`);
