@@ -3,6 +3,7 @@ require_once __DIR__ . '/../db/db.php';
 
 $passcode = $_POST['passcode'] ?? '';
 $taskId = intval($_POST['task_id'] ?? 0);
+$comment = trim($_POST['comment'] ?? '');
 
 if (!$passcode || !$taskId || !isset($_FILES['attachment'])) {
   http_response_code(400);
@@ -39,8 +40,8 @@ $pdo->beginTransaction();
 $stmt = $pdo->prepare("UPDATE tasks SET status = 'pending_review', submission_time = NOW() WHERE id = ?");
 $stmt->execute([$taskId]);
 
-$stmt = $pdo->prepare("INSERT INTO submissions (task_id, user_passcode, file_path, submitted_at) VALUES (?, ?, ?, NOW())");
-$stmt->execute([$taskId, $passcode, $uniqueName]);
+$stmt = $pdo->prepare("INSERT INTO submissions (task_id, user_passcode, file_path, comment, submitted_at) VALUES (?, ?, ?, ?, NOW())");
+$stmt->execute([$taskId, $passcode, $uniqueName, $comment]);
 
 $pdo->commit();
 

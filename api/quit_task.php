@@ -8,6 +8,7 @@ require_once __DIR__ . '/../db/db.php';
 $data = json_decode(file_get_contents("php://input"), true);
 $taskId = $data["task_id"] ?? null;
 $passcode = $data["passcode"] ?? "";
+$comment = trim($data["comment"] ?? "");
 
 if (!$taskId || !$passcode) {
   http_response_code(400);
@@ -15,7 +16,7 @@ if (!$taskId || !$passcode) {
   exit;
 }
 
-$stmt = $pdo->prepare("UPDATE tasks SET status = 'available', assigned_to = NULL, start_time = NULL WHERE id = ? AND assigned_to = ?");
-$success = $stmt->execute([$taskId, $passcode]);
+$stmt = $pdo->prepare("UPDATE tasks SET status = 'available', assigned_to = NULL, start_time = NULL, quit_comment = ? WHERE id = ? AND assigned_to = ?");
+$success = $stmt->execute([$comment, $taskId, $passcode]);
 
 echo json_encode(["success" => $success]);

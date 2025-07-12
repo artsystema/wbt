@@ -20,7 +20,8 @@ CREATE TABLE tasks (
   status ENUM('available', 'in_progress', 'pending_review', 'completed') DEFAULT 'available',
   assigned_to VARCHAR(255),
   start_time DATETIME,
-  submission_time DATETIME
+  submission_time DATETIME,
+  quit_comment TEXT
 );
 
 CREATE TABLE submissions (
@@ -28,6 +29,7 @@ CREATE TABLE submissions (
   task_id INT,
   user_passcode VARCHAR(255),
   file_path TEXT,
+  comment TEXT,
   submitted_at DATETIME,
   FOREIGN KEY (task_id) REFERENCES tasks(id)
 );
