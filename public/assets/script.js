@@ -321,10 +321,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 });
 
-
-
-                    ;
-
                 if (!isInProgress) {
                     const btn = div.querySelector("button");
                     const takeBtn = Array.from(div.querySelectorAll("button")).find(b => b.textContent === "Take");
