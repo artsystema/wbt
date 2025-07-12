@@ -245,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   <button type="submit" class="quitBtn">Quit</button>
               </form>
               <input type="text" placeholder="Note (optional)" class="noteField" />`;
+
                 }
 
                 div.innerHTML = `
@@ -355,6 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         formData.append("attachment", fileInput.files[0]);
                         formData.append("task_id", task.id);
                         formData.append("passcode", passcode);
+
                         if (noteField) formData.append("comment", noteField.value);
 
                         fetch("/wbt/api/submit.php", {
@@ -377,6 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         quitForm.addEventListener("submit", e => {
                             e.preventDefault();
                             if (!confirm("Are you sure you want to quit this task?")) return;
+
                             const noteField = div.querySelector(".noteField");
                             const comment = noteField ? noteField.value : "";
                             fetch("/wbt/api/quit_task.php", {
