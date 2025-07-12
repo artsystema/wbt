@@ -3,7 +3,7 @@ require_once __DIR__ . '/../db/db.php';
 
 // Get pending review tasks with submission info
 $stmt = $pdo->query("
-  SELECT t.*, s.file_path, s.submitted_at, u.note
+  SELECT t.*, s.file_path, s.submitted_at, s.comment, u.note
   FROM tasks t
   JOIN submissions s ON t.id = s.task_id
   LEFT JOIN users u ON s.user_passcode = u.passcode
@@ -34,6 +34,7 @@ $tasks = $stmt->fetchAll();
       <p><strong>User:</strong> <?= htmlspecialchars($task['assigned_to']) ?></p>
       <p><strong>Submitted:</strong> <?= $task['submitted_at'] ?></p>
       <p><strong>Note:</strong> <?= htmlspecialchars($task['note'] ?? '—') ?></p>
+      <p><strong>Comment:</strong> <?= htmlspecialchars($task['comment'] ?? '—') ?></p>
       <a href="/wbt/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download submission</a>
 		<div>      
 		<form action="/wbt/api/approve.php" method="POST">
@@ -81,6 +82,9 @@ $tasks = $stmt->fetchAll();
 	
 	</div>
     <div><?= nl2br(htmlspecialchars($task['description'])) ?>
+      <?php if (!empty($task['quit_comment'])): ?>
+        <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
+      <?php endif; ?>
 	
 		<?php
 			$dir = __DIR__ . "/../uploads/{$task['id']}/in";
