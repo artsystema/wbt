@@ -50,6 +50,11 @@ connection logic are found in `db/`.
    ```sql
    ALTER TABLE tasks ADD COLUMN category VARCHAR(255);
    ```
+7. A `last_rejected` column tracks the user whose submission was rejected.
+   To upgrade an existing database run:
+   ```sql
+   ALTER TABLE tasks ADD COLUMN last_rejected VARCHAR(255);
+   ```
 
 ## Expired Task Reset
 
