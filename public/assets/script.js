@@ -138,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             authStatus.innerHTML = "";
             historyBtn.style.display = "none";
         }
+        loadTasks();
     }
 
     authBtn.addEventListener("click", () => {
@@ -154,14 +155,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    fetch("/wbt/api/tasks.php")
+
+function loadTasks() {
+    const url = passcode ? `/wbt/api/tasks.php?passcode=${encodeURIComponent(passcode)}` : '/wbt/api/tasks.php';
+    fetch(url)
         .then(res => res.json())
         .then(tasks => {
             taskList.innerHTML = "";
 
             const header = document.createElement("div");
             header.className = "task header";
-            header.innerHTML = `     
+            header.innerHTML = `
                 <div>Title</div>
                 <div>Description</div>
                 <div>Time</div>
@@ -251,7 +255,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 div.innerHTML = `
-           
           <div>
             <div><strong>[${task.id}] ${task.title}</strong></div>
             <div class="task-meta">Posted on ${new Date(task.date_posted).toLocaleString()}</div>
@@ -403,7 +406,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 }
 
-
                 if (div.classList.contains('completed')) {
                     taskListCompleted.appendChild(div);
                     taskListCompleted.style.display = "block";
@@ -411,11 +413,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     taskList.appendChild(div);
                 }
 
-
-
             });
+            applyFilters();
         });
-
+}
     fetch("/wbt/api/fund.php")
         .then(res => res.json())
         .then(bank => {
