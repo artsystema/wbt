@@ -117,7 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         rankSpan = `<span class="user-rank-meta">[<span class="user-rank" title="${top}">${stats.rank}</span><span class="user-star">★</span><span class="user-coeff" title="${coeffTitle}">${stats.payout_coeff.toFixed(2)}</span>]</span>`;
                     }
 
-                    authStatus.innerHTML = `Authorized as [<strong>${passcode}</strong>]${rankSpan}${userMeta} <button id="deauthBtn">Exit</button>`;
+                    const histLink = `history.php?user=${encodeURIComponent(passcode)}`;
+                    authStatus.innerHTML = `Authorized as [<strong><a href="${histLink}">${passcode}</a></strong>]${rankSpan}${userMeta} <button id="deauthBtn">Exit</button>`;
 
                     document.querySelectorAll('.user-metric.clickable').forEach(el => {
                         el.addEventListener('click', () => {
