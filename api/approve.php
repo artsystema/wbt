@@ -47,6 +47,10 @@ $stmt->execute([$passcode]);
 $stmt = $pdo->prepare("UPDATE fund_bank SET total_funds = total_funds - ?, last_updated = NOW() WHERE id = 1");
 $stmt->execute([$total]);
 
+// Record payout
+$stmt = $pdo->prepare("INSERT INTO payouts (passcode, amount, paid_at) VALUES (?, ?, NOW())");
+$stmt->execute([$passcode, $total]);
+
 $pdo->commit();
 
 header("Location: /wbt/public/admin.php");

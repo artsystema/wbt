@@ -21,7 +21,8 @@ CREATE TABLE tasks (
   assigned_to VARCHAR(255),
   start_time DATETIME,
   submission_time DATETIME,
-  quit_comment TEXT
+  quit_comment TEXT,
+  last_rejected VARCHAR(255)
 );
 
 CREATE TABLE submissions (
@@ -47,3 +48,10 @@ CREATE TABLE fund_bank (
 );
 
 INSERT INTO fund_bank (id, total_funds, last_updated) VALUES (1, 0.00, NOW());
+
+CREATE TABLE payouts (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  passcode VARCHAR(255) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  paid_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

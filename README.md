@@ -52,6 +52,7 @@ connection logic are found in `db/`.
    ```sql
    ALTER TABLE tasks ADD COLUMN category VARCHAR(255);
    ```
+
 7. Versions after 1.1 use a `payouts` table to record completed payments. If
    upgrading run:
    ```sql
@@ -61,6 +62,12 @@ connection logic are found in `db/`.
      amount DECIMAL(10,2),
      paid_at DATETIME DEFAULT CURRENT_TIMESTAMP
    );
+
+8. A `last_rejected` column tracks the user whose submission was rejected.
+   To upgrade an existing database run:
+   ```sql
+   ALTER TABLE tasks ADD COLUMN last_rejected VARCHAR(255);
+
    ```
 
 ## Expired Task Reset
