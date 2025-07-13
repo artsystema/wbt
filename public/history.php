@@ -69,7 +69,7 @@ foreach ($tasks as $t) {
   <?php endif; ?>
 <?php endforeach; ?>
 </div>
-<div id="taskListCompleted"<?= $completed > 0 ? '' : ' style="display:none;"' ?> >
+<div id="taskListCompleted"<?= $completed > 0 ? 'style="display:block;' : ' style="display:none;"' ?> >
 <?php foreach ($tasks as $task): ?>
   <?php if ($task['status'] === 'completed'): ?>
     <div class="task completed">
