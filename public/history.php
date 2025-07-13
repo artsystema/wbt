@@ -37,6 +37,7 @@ foreach ($tasks as $t) {
             <strong>WBT 1.0</strong>
             <span class="top-bar-info">[<span style="color:blue;"><strong><?= $inProgress ?></strong></span> in progress | <?= $pending ?> submitted | <?= $completed ?> completed]</span>
         </div>
+        <div class="top-bar-user">User: <strong><?= htmlspecialchars($passcode) ?></strong></div>
     </div>
     <div class="top-bar-right">
         <a href="index.php">Back</a>
@@ -68,7 +69,7 @@ foreach ($tasks as $t) {
   <?php endif; ?>
 <?php endforeach; ?>
 </div>
-<div id="taskListCompleted">
+<div id="taskListCompleted"<?= $completed > 0 ? '' : ' style="display:none;"' ?> >
 <?php foreach ($tasks as $task): ?>
   <?php if ($task['status'] === 'completed'): ?>
     <div class="task completed">

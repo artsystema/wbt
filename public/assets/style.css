@@ -54,6 +54,9 @@ button {
     align-items: center;
     gap: 10px;
 }
+.top-bar-user {
+    white-space: nowrap;
+}
 .top-bar-right {
     margin-left: auto;
     display: flex;
