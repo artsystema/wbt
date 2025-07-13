@@ -146,6 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
             authStatus.innerHTML = "";
             historyBtn.style.display = "none";
         }
+
+        fetchTasks();
     }
 
     authBtn.addEventListener("click", () => {
@@ -162,93 +164,91 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-    const tasksUrl = passcode ? `/wbt/api/tasks.php?passcode=${encodeURIComponent(passcode)}` : "/wbt/api/tasks.php";
-    fetch(tasksUrl)
-        .then(res => res.json())
-        .then(tasks => {
-            taskList.innerHTML = "";
+    function fetchTasks() {
+        const tasksUrl = passcode ? `/wbt/api/tasks.php?passcode=${encodeURIComponent(passcode)}` : "/wbt/api/tasks.php";
+        fetch(tasksUrl)
+            .then(res => res.json())
+            .then(tasks => {
+                taskList.innerHTML = "";
 
-            const header = document.createElement("div");
-            header.className = "task header";
-            header.innerHTML = `     
-                <div>Title</div>
-                <div>Description</div>
-                <div>Time</div>
-                <div>Reward</div>
-                <div>Status</div>
-                <div>Action</div>
-            `;
-            taskList.appendChild(header);
+                const header = document.createElement("div");
+                header.className = "task header";
+                header.innerHTML = `
+                    <div>Title</div>
+                    <div>Description</div>
+                    <div>Time</div>
+                    <div>Reward</div>
+                    <div>Status</div>
+                    <div>Action</div>
+                `;
+                taskList.appendChild(header);
 
-            if (tasks.length === 0) {
-                const emptyRow = document.createElement("div");
-                emptyRow.className = "task";
-                emptyRow.innerHTML = "<div>No tasks available</div>";
-                taskList.appendChild(emptyRow);
-                return;
-            }
-
-            let availableCount = 0;
-            let inProgressCount = 0;
-
-            const activeJobs = [];
-            const completedJobs = [];
-
-            tasks.forEach(task => {
-                if (task.status === "available") availableCount++;
-                if (task.status === "in_progress") inProgressCount++;
-
-                if (task.status === "completed") {
-                    completedJobs.push(task);
-                } else {
-                    activeJobs.push(task);
+                if (tasks.length === 0) {
+                    const emptyRow = document.createElement("div");
+                    emptyRow.className = "task";
+                    emptyRow.innerHTML = "<div>No tasks available</div>";
+                    taskList.appendChild(emptyRow);
+                    return;
                 }
-            });
 
-            document.getElementById("taskStats").innerHTML = `[<span style="color:green;"><strong>${availableCount}</strong></span> available, ${inProgressCount} in progress]`;
+                let availableCount = 0;
+                let inProgressCount = 0;
 
-            tasks.forEach(task => {
-                //if (task.status === "completed") return;
+                const activeJobs = [];
+                const completedJobs = [];
 
-                const div = document.createElement("div");
-                div.className = "task";
-                div.dataset.id = task.id;
-                div.className = `task ${task.status}`;
-                div.dataset.owner = task.assigned_to || '';
-                div.dataset.status = task.status;
-                div.dataset.category = task.category || '';
+                tasks.forEach(task => {
+                    if (task.status === "available") availableCount++;
+                    if (task.status === "in_progress") inProgressCount++;
 
-                const isOwner = passcode && passcode === task.assigned_to;
-                const isInProgress = task.status === "in_progress";
-                const isPending = task.status === "pending_review";
-
-                let statusDisplay = task.status;
-                let actionHTML = "";
-
-                if (task.status === "in_progress") {
-                    if (isOwner && task.start_time) {
-                        const countdown = document.createElement("span");
-                        countdown.className = "countdown";
-                        const endTime = new Date(task.start_time).getTime() + task.estimated_minutes * 60000;
-                        const estimatedMs = task.estimated_minutes * 60000;
-
-                        countdown.dataset.end = new Date(endTime).toISOString();
-                        countdown.dataset.estimatedMs = estimatedMs;
-                        statusDisplay = countdown.outerHTML;
-                        //statusDisplay = "<span>pending review</span>";
+                    if (task.status === "completed") {
+                        completedJobs.push(task);
                     } else {
-                        statusDisplay = "<span>in progress</span>";
+                        activeJobs.push(task);
                     }
-                }
+                });
 
-                if (!isInProgress) {
-                    if (task.status === "available") {
-                        actionHTML = `<button data-id="${task.id}">Take</button>`;
-                    } else if (isPending && isOwner && task.comment) {
-                        actionHTML = `<em class="task-comment">${escapeHtml(task.comment)}</em>`;
+                document.getElementById("taskStats").innerHTML = `[<span style="color:green;"><strong>${availableCount}</strong></span> available, ${inProgressCount} in progress]`;
+
+                tasks.forEach(task => {
+                    const div = document.createElement("div");
+                    div.className = "task";
+                    div.dataset.id = task.id;
+                    div.className = `task ${task.status}`;
+                    div.dataset.owner = task.assigned_to || '';
+                    div.dataset.status = task.status;
+                    div.dataset.category = task.category || '';
+
+                    const isOwner = passcode && passcode === task.assigned_to;
+                    const isInProgress = task.status === "in_progress";
+                    const isPending = task.status === "pending_review";
+
+                    let statusDisplay = task.status;
+                    let actionHTML = "";
+
+                    if (task.status === "in_progress") {
+                        if (isOwner && task.start_time) {
+                            const countdown = document.createElement("span");
+                            countdown.className = "countdown";
+                            const endTime = new Date(task.start_time).getTime() + task.estimated_minutes * 60000;
+                            const estimatedMs = task.estimated_minutes * 60000;
+
+                            countdown.dataset.end = new Date(endTime).toISOString();
+                            countdown.dataset.estimatedMs = estimatedMs;
+                            statusDisplay = countdown.outerHTML;
+                        } else {
+                            statusDisplay = "<span>in progress</span>";
+                        }
                     }
-                } else if (isOwner) {
-                    actionHTML = `<form class="uploadForm" data-id="${task.id}" enctype="multipart/form-data" style="display:inline;">
+
+                    if (!isInProgress) {
+                        if (task.status === "available") {
+                            actionHTML = `<button data-id="${task.id}">Take</button>`;
+                        } else if (isPending && isOwner && task.comment) {
+                            actionHTML = `<em class="task-comment">${escapeHtml(task.comment)}</em>`;
+                        }
+                    } else if (isOwner) {
+                        actionHTML = `<form class="uploadForm" data-id="${task.id}" enctype="multipart/form-data" style="display:inline;">
                   <input type="file" name="attachment" required />
                   <button type="submit">Submit</button>
               </form>
@@ -257,10 +257,10 @@ document.addEventListener("DOMContentLoaded", () => {
               </form>
               <input type="text" placeholder="Note (optional)" class="noteField" />`;
 
-                }
+                    }
 
-                div.innerHTML = `
-           
+                    div.innerHTML = `
+
           <div>
             <div><strong>[${task.id}] ${task.title}</strong></div>
             <div class="task-meta">Posted on ${new Date(task.date_posted).toLocaleString()}</div>
@@ -269,169 +269,165 @@ document.addEventListener("DOMContentLoaded", () => {
           <div>
   ${task.description}
   ${
-                    task.attachments && Array.isArray(task.attachments) && task.attachments.length > 0
-                        ? `<div class="attachments"><strong>Attachments:</strong><ul>` +
-                    (task.attachments || []).map(file => {
-                        const name = file.split("/").pop();
-                        const ext = name.split('.').pop().toLowerCase();
-                        const supported = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mp3', 'txt'];
+                        task.attachments && Array.isArray(task.attachments) && task.attachments.length > 0
+                            ? `<div class="attachments"><strong>Attachments:</strong><ul>` +
+                        (task.attachments || []).map(file => {
+                            const name = file.split("/").pop();
+                            const ext = name.split('.').pop().toLowerCase();
+                            const supported = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mp3', 'txt'];
 
-                        const safeId = `preview-${task.id}-${name.replace(/[^a-z0-9]/gi, '_')}`;
-                        let previewBtn = '';
-                        let previewContainer = '';
+                            const safeId = `preview-${task.id}-${name.replace(/[^a-z0-9]/gi, '_')}`;
+                            let previewBtn = '';
+                            let previewContainer = '';
 
-                        if (supported.includes(ext)) {
-                            previewBtn = `<button type="button" class="preview-toggle" data-src="${file}" data-type="${ext}" data-target="${safeId}">Preview</button>`;
-                            previewContainer = `<div class="preview-container" id="${safeId}" style="display:none;"></div>`;
-                        }
+                            if (supported.includes(ext)) {
+                                previewBtn = `<button type="button" class="preview-toggle" data-src="${file}" data-type="${ext}" data-target="${safeId}">Preview</button>`;
+                                previewContainer = `<div class="preview-container" id="${safeId}" style="display:none;"></div>`;
+                            }
 
-                        return `<li>
+                            return `<li>
         <a href="${file}" target="_blank">${name}</a>
         ${previewBtn}
         ${previewContainer}
     </li>`;
-                    }).join("") +`</ul></div>`  : ""}
+                        }).join("") +`</ul></div>`  : ""}
 </div>
           <div>${formatTime(task.estimated_minutes)}</div>
           <div>$${task.reward}</div>
           <div>${statusDisplay}</div>
           <div>${actionHTML}</div>
           `;
-                const cat = div.querySelector('.task-category');
-                if (cat && cat.textContent.trim()) {
-                    cat.classList.add('clickable');
-                    cat.addEventListener('click', () => {
-                        addFilter('category', cat.textContent.trim(), cat.textContent.trim());
-                    });
-                }
-
-                div.querySelectorAll(".preview-toggle").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const container = div.querySelector(`#${btn.dataset.target}`);
-                        const src = btn.dataset.src;
-                        const type = btn.dataset.type;
-
-                        const isOpen = container.style.display === "block";
-                        container.style.display = isOpen ? "none" : "block";
-                        btn.textContent = isOpen ? "Preview" : "Hide";
-
-                        if (isOpen || container.innerHTML.trim()) return; // Already shown
-
-                        let html = '';
-                        if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(type)) {
-                            html = `<img src="${src}" style="max-width:100%; max-height:300px;">`;
-                        } else if (type === 'mp4') {
-                            html = `<video src="${src}" controls style="max-width:100%; max-height:300px;"></video>`;
-                        } else if (type === 'mp3') {
-                            html = `<audio src="${src}" controls></audio>`;
-                        } else if (type === 'txt') {
-                            fetch(src).then(res => res.text()).then(text => {
-                                container.innerHTML = `<pre style="white-space: pre-wrap; overflow:auto;">${text}</pre>`;
-                            });
-                            return;
-                        }
-
-                        container.innerHTML = html;
-                    });
-                });
-
-                if (!isInProgress) {
-                    const btn = div.querySelector("button");
-                    const takeBtn = Array.from(div.querySelectorAll("button")).find(b => b.textContent === "Take");
-                    if (takeBtn) {
-                        takeBtn.addEventListener("click", (e) => {
-                            e.stopPropagation();
-                            if (!passcode) return alert("Enter passcode first.");
-                            fetch("/wbt/api/tasks.php", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ task_id: task.id, passcode })
-                            })
-                                .then(res => res.json())
-                                .then(result => {
-                                    if (result.success) location.reload();
-                                    else alert("Error: " + (result.error || "Unknown"));
-                                });
+                    const cat = div.querySelector('.task-category');
+                    if (cat && cat.textContent.trim()) {
+                        cat.classList.add('clickable');
+                        cat.addEventListener('click', () => {
+                            addFilter('category', cat.textContent.trim(), cat.textContent.trim());
                         });
                     }
 
-                }
+                    div.querySelectorAll(".preview-toggle").forEach(btn => {
+                        btn.addEventListener("click", () => {
+                            const container = div.querySelector(`#${btn.dataset.target}`);
+                            const src = btn.dataset.src;
+                            const type = btn.dataset.type;
 
-                const form = div.querySelector(".uploadForm");
-                if (form) {
-                    form.addEventListener("submit", e => {
-                        e.preventDefault();
-                        const fileInput = form.querySelector("input[name=attachment]");
-                        const noteField = div.querySelector(".noteField");
-                        const formData = new FormData();
-                        formData.append("attachment", fileInput.files[0]);
-                        formData.append("task_id", task.id);
-                        formData.append("passcode", passcode);
+                            const isOpen = container.style.display === "block";
+                            container.style.display = isOpen ? "none" : "block";
+                            btn.textContent = isOpen ? "Preview" : "Hide";
 
-                        if (noteField) formData.append("comment", noteField.value);
+                            if (isOpen || container.innerHTML.trim()) return;
 
-                        fetch("/wbt/api/submit.php", {
-                            method: "POST",
-                            body: formData
-                        })
-                            .then(res => res.json())
-                            .then(result => {
-                                if (result.success) {
-                                    alert("Submitted successfully!");
-                                    location.reload();
-                                } else {
-                                    alert("Upload failed: " + (result.error || "Unknown"));
-                                }
-                            });
+                            let html = '';
+                            if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(type)) {
+                                html = `<img src="${src}" style="max-width:100%; max-height:300px;">`;
+                            } else if (type === 'mp4') {
+                                html = `<video src="${src}" controls style="max-width:100%; max-height:300px;"></video>`;
+                            } else if (type === 'mp3') {
+                                html = `<audio src="${src}" controls></audio>`;
+                            } else if (type === 'txt') {
+                                fetch(src).then(res => res.text()).then(text => {
+                                    container.innerHTML = `<pre style="white-space: pre-wrap; overflow:auto;">${text}</pre>`;
+                                });
+                                return;
+                            }
+
+                            container.innerHTML = html;
+                        });
                     });
 
-                    const quitForm = div.querySelector(".quitForm");
-                    if (quitForm) {
-                        quitForm.addEventListener("submit", e => {
-                            e.preventDefault();
-                            if (!confirm("Are you sure you want to quit this task?")) return;
+                    if (!isInProgress) {
+                        const takeBtn = Array.from(div.querySelectorAll("button")).find(b => b.textContent === "Take");
+                        if (takeBtn) {
+                            takeBtn.addEventListener("click", (e) => {
+                                e.stopPropagation();
+                                if (!passcode) return alert("Enter passcode first.");
+                                fetch("/wbt/api/tasks.php", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ task_id: task.id, passcode })
+                                })
+                                    .then(res => res.json())
+                                    .then(result => {
+                                        if (result.success) location.reload();
+                                        else alert("Error: " + (result.error || "Unknown"));
+                                    });
+                            });
+                        }
 
+                    }
+
+                    const form = div.querySelector(".uploadForm");
+                    if (form) {
+                        form.addEventListener("submit", e => {
+                            e.preventDefault();
+                            const fileInput = form.querySelector("input[name=attachment]");
                             const noteField = div.querySelector(".noteField");
-                            const comment = noteField ? noteField.value : "";
-                            fetch("/wbt/api/quit_task.php", {
+                            const formData = new FormData();
+                            formData.append("attachment", fileInput.files[0]);
+                            formData.append("task_id", task.id);
+                            formData.append("passcode", passcode);
+
+                            if (noteField) formData.append("comment", noteField.value);
+
+                            fetch("/wbt/api/submit.php", {
                                 method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({ task_id: task.id, passcode, comment })
+                                body: formData
                             })
                                 .then(res => res.json())
                                 .then(result => {
                                     if (result.success) {
-                                        alert("Task has been quit and relisted.");
+                                        alert("Submitted successfully!");
                                         location.reload();
                                     } else {
-                                        alert("Error: " + (result.error || "Unknown"));
+                                        alert("Upload failed: " + (result.error || "Unknown"));
                                     }
                                 });
                         });
+
+                        const quitForm = div.querySelector(".quitForm");
+                        if (quitForm) {
+                            quitForm.addEventListener("submit", e => {
+                                e.preventDefault();
+                                if (!confirm("Are you sure you want to quit this task?")) return;
+
+                                const noteField = div.querySelector(".noteField");
+                                const comment = noteField ? noteField.value : "";
+                                fetch("/wbt/api/quit_task.php", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ task_id: task.id, passcode, comment })
+                                })
+                                    .then(res => res.json())
+                                    .then(result => {
+                                        if (result.success) {
+                                            alert("Task has been quit and relisted.");
+                                            location.reload();
+                                        } else {
+                                            alert("Error: " + (result.error || "Unknown"));
+                                        }
+                                    });
+                            });
+                        }
+
                     }
 
-                }
-
-
-                if (div.classList.contains('completed')) {
-                    taskListCompleted.appendChild(div);
-                    taskListCompleted.style.display = "block";
-                } else {
-                    taskList.appendChild(div);
-                }
-
-
-
+                    if (div.classList.contains('completed')) {
+                        taskListCompleted.appendChild(div);
+                        taskListCompleted.style.display = "block";
+                    } else {
+                        taskList.appendChild(div);
+                    }
+                });
             });
-        });
 
-    fetch("/wbt/api/fund.php")
-        .then(res => res.json())
-        .then(bank => {
-            const text = `$${bank.available} available`;
-            const reserved = bank.reserved > 0 ? ` ($${bank.reserved} reserved)` : '';
-            bankDisplay.textContent = text + reserved;
-        });
+        fetch("/wbt/api/fund.php")
+            .then(res => res.json())
+            .then(bank => {
+                const text = `$${bank.available} available`;
+                const reserved = bank.reserved > 0 ? ` ($${bank.reserved} reserved)` : '';
+                bankDisplay.textContent = text + reserved;
+            });
+    }
 
 
     function getFileIcon(file) {
