@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (stats.completed_jobs > 0 && stats.rank) {
                         const top = (stats.top10 || []).map((u, i) => `${i + 1}. ${u.assigned_to} ($${u.total})`).join('\n');
                         const coeffTitle = `${Math.round(stats.payout_coeff * 100)}% payout coefficient`;
-                        rankSpan = `<span class="user-rank-meta">[<span class="user-rank" title="${top}">${stats.rank}</span>★<span class="user-coeff" title="${coeffTitle}">${stats.payout_coeff.toFixed(2)}</span>]</span>`;
+                        rankSpan = `<span class="user-rank-meta">[<span class="user-rank" title="${top}">${stats.rank}</span><span class="user-star">★</span><span class="user-coeff" title="${coeffTitle}">${stats.payout_coeff.toFixed(2)}</span>]</span>`;
                     }
 
                     authStatus.innerHTML = `Authorized as [<strong>${passcode}</strong>]${rankSpan}${userMeta} <button id="deauthBtn">Exit</button>`;
