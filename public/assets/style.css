@@ -106,6 +106,10 @@ span > strong:hover {
 .task > div:last-child {
     line-height: 2;
 }
+.task.pending_review > div:last-child {
+    line-height: 1;
+    font-size: 11px;
+}
 .task.header > div:last-child {
     line-height: normal;
 }
