@@ -28,9 +28,13 @@ if (!$task) {
   echo "Task not found";
   exit;
 }
+
 $reward = $task['reward'];
 $bonus = round($reward * $bonusPercent, 2);
-$total = $reward + $bonus;
+$computedTotal = $reward + $bonus;
+
+$posted = isset($_POST['payout']) ? floatval($_POST['payout']) : 0;
+$total = $posted > 0 ? $posted : $computedTotal;
 
 // Deduct from fund bank
 $pdo->beginTransaction();
@@ -46,6 +50,10 @@ $stmt->execute([$passcode]);
 // Deduct from fund
 $stmt = $pdo->prepare("UPDATE fund_bank SET total_funds = total_funds - ?, last_updated = NOW() WHERE id = 1");
 $stmt->execute([$total]);
+
+// Record fund transaction
+$stmt = $pdo->prepare("INSERT INTO fund_transactions (txn_type, amount, description) VALUES ('payout', ?, ?)");
+$stmt->execute([$total, 'Task ' . $taskId]);
 
 // Record payout
 $stmt = $pdo->prepare("INSERT INTO payouts (passcode, amount, paid_at) VALUES (?, ?, NOW())");
