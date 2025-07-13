@@ -35,7 +35,7 @@ a {
     gap: 20px;
 }
 .top-bar-info {
-    display: block;
+    display: inline-block;
 }
 #authControls {
     display: flex;
