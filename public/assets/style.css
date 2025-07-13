@@ -262,3 +262,17 @@ div#taskListCompleted::before {
 .progress-stripe div:first-child {
     margin-left: 1px;
 }
+
+/* ===== User Ranking ===== */
+.user-rank-meta {
+    margin-left: 8px;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+.user-rank-meta .user-rank,
+.user-rank-meta .user-coeff {
+    font-weight: bold;
+}
+.user-rank-meta .user-coeff {
+    margin-left: 2px;
+}

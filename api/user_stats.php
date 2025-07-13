@@ -18,7 +18,10 @@ $stats = [
   'active_jobs' => 0,
   'submitted_jobs' => 0, // <-- added
   'completed_jobs' => 0,
-  'last_submission' => null
+  'last_submission' => null,
+  'rank' => null,
+  'payout_coeff' => 1.0,
+  'top10' => []
 ];
 
 try {
@@ -51,6 +54,29 @@ $stats['completed_jobs'] = intval($stmt->fetchColumn());
   $stmt = $pdo->prepare("SELECT MAX(submitted_at) FROM submissions WHERE user_passcode = ?");
   $stmt->execute([$passcode]);
   $stats['last_submission'] = $stmt->fetchColumn();
+
+  // ---- Rank and payout coefficient ----
+  // Total reward from completed tasks for this user
+  $stmt = $pdo->prepare("SELECT SUM(reward) FROM tasks WHERE assigned_to = ? AND status = 'completed'");
+  $stmt->execute([$passcode]);
+  $user_total = floatval($stmt->fetchColumn());
+
+  if ($stats['completed_jobs'] > 0) {
+    // Determine rank by comparing totals across users
+    $rankStmt = $pdo->prepare("SELECT COUNT(*) + 1 FROM (SELECT assigned_to, SUM(reward) AS total FROM tasks WHERE status = 'completed' GROUP BY assigned_to) t WHERE total > ?");
+    $rankStmt->execute([$user_total]);
+    $stats['rank'] = intval($rankStmt->fetchColumn());
+
+    // Determine payout coefficient based on bonus rules
+    $bonusStmt = $pdo->prepare("SELECT bonus_percent FROM bonus_rules WHERE min_tasks <= ? ORDER BY min_tasks DESC LIMIT 1");
+    $bonusStmt->execute([$stats['completed_jobs']]);
+    $bonusPercent = floatval($bonusStmt->fetchColumn() ?: 0);
+    $stats['payout_coeff'] = 1 + $bonusPercent;
+
+    // Top 10 leaderboard for tooltip
+    $topStmt = $pdo->query("SELECT assigned_to, SUM(reward) AS total FROM tasks WHERE status = 'completed' GROUP BY assigned_to ORDER BY total DESC LIMIT 10");
+    $stats['top10'] = $topStmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 
   echo json_encode($stats);
 

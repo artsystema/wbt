@@ -9,15 +9,15 @@ if (!$taskId) {
 }
 
 // Reset task status
-$stmt = $pdo->prepare("
-  UPDATE tasks
-  SET status = 'available',
-      assigned_to = NULL,
-      start_time = NULL,
-      submission_time = NULL
-  WHERE id = ?
-");
+$stmt = $pdo->prepare("SELECT assigned_to FROM tasks WHERE id = ?");
 $stmt->execute([$taskId]);
+$rejectedUser = $stmt->fetchColumn();
+
+// Reset task status and remember who was rejected
+$stmt = $pdo->prepare(
+    "UPDATE tasks SET status = 'available', assigned_to = NULL, start_time = NULL, submission_time = NULL, last_rejected = ? WHERE id = ?"
+);
+$stmt->execute([$rejectedUser, $taskId]);
 
 // Optional: delete submission record
 $stmt = $pdo->prepare("DELETE FROM submissions WHERE task_id = ?");
