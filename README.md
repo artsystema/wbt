@@ -14,6 +14,8 @@ MySQL server.
 - Countdown timer showing time remaining for in‑progress tasks
 - Basic user statistics such as active/completed jobs and last submission time
 - Fund tracking to monitor available and reserved payout amounts
+- Worker ranking system with an adjustable payout coefficient
+- Payment history stored in a dedicated `payouts` table
 
 ## Directory Layout
 
@@ -50,6 +52,16 @@ connection logic are found in `db/`.
    ```sql
    ALTER TABLE tasks ADD COLUMN category VARCHAR(255);
    ```
+7. Versions after 1.1 use a `payouts` table to record completed payments. If
+   upgrading run:
+   ```sql
+   CREATE TABLE payouts (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     passcode VARCHAR(255),
+     amount DECIMAL(10,2),
+     paid_at DATETIME DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
 
 ## Expired Task Reset
 
@@ -63,6 +75,18 @@ reset expired tasks even if no users are active.
 Approved tasks deduct their reward (plus any bonus specified in the
 `bonus_rules` table) from the `fund_bank` total. Available and reserved fund
 amounts are shown in the page header via the `api/fund.php` endpoint.
+
+## Payouts Table
+
+Completed payouts are tracked in the `payouts` table. Insert a row whenever you
+disburse money to a worker:
+
+```sql
+INSERT INTO payouts (passcode, amount) VALUES ('worker1', 10.00);
+```
+
+`/api/user_stats.php` sums these rows to display how much each user has been
+paid so far.
 
 ---
 
