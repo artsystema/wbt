@@ -23,6 +23,22 @@ $transactions = $stmt->fetchAll();
 </tr>
 <?php endforeach; ?>
 </table>
-<p><a href="admin.php">Back to Admin</a></p>
+<?php
+$ref = $_SERVER['HTTP_REFERER'] ?? '';
+$back = 'index.php';
+if ($ref) {
+    $parts = parse_url($ref);
+    if ((!isset($parts['host']) || $parts['host'] === $_SERVER['HTTP_HOST']) && isset($parts['path'])) {
+        $path = basename($parts['path']);
+        if ($path && $path !== basename($_SERVER['SCRIPT_NAME'])) {
+            $back = ltrim($parts['path'], '/');
+            if (isset($parts['query'])) {
+                $back .= '?' . $parts['query'];
+            }
+        }
+    }
+}
+?>
+<p><a href="<?= htmlspecialchars($back) ?>">Back</a></p>
 </body>
 </html>
