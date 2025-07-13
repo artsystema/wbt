@@ -170,6 +170,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(res => res.json())
             .then(tasks => {
                 taskList.innerHTML = "";
+                taskListCompleted.innerHTML = "";
+                taskListCompleted.style.display = "none";
 
                 const header = document.createElement("div");
                 header.className = "task header";
@@ -194,18 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 let availableCount = 0;
                 let inProgressCount = 0;
 
-                const activeJobs = [];
-                const completedJobs = [];
-
                 tasks.forEach(task => {
                     if (task.status === "available") availableCount++;
                     if (task.status === "in_progress") inProgressCount++;
-
-                    if (task.status === "completed") {
-                        completedJobs.push(task);
-                    } else {
-                        activeJobs.push(task);
-                    }
                 });
 
                 document.getElementById("taskStats").innerHTML = `[<span style="color:green;"><strong>${availableCount}</strong></span> available, ${inProgressCount} in progress]`;
