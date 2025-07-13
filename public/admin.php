@@ -12,6 +12,21 @@ $stmt = $pdo->query("
 ");
 $pending = $stmt->fetchAll();
 
+// Pre-calculate payout amounts with user coefficient
+foreach ($pending as &$p) {
+    $stmtC = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE assigned_to = ? AND status = 'completed'");
+    $stmtC->execute([$p['assigned_to']]);
+    $completed = $stmtC->fetchColumn();
+
+    $stmtB = $pdo->prepare("SELECT bonus_percent FROM bonus_rules WHERE min_tasks <= ? ORDER BY min_tasks DESC LIMIT 1");
+    $stmtB->execute([$completed]);
+    $bonus = $stmtB->fetchColumn() ?: 0;
+
+    $coeff = 1 + $bonus;
+    $p['payout_amount'] = round($p['reward'] * $coeff, 2);
+}
+unset($p);
+
 // Get all tasks (for listing + edit/delete)
 $stmt = $pdo->query("SELECT * FROM tasks ORDER BY date_posted DESC");
 $tasks = $stmt->fetchAll();
@@ -39,9 +54,10 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       </div>
     </div>
     <div class="top-bar-right">
-      <form action="/wbt/api/set_fund.php" method="POST" style="display:flex;gap:6px;align-items:center;">
-        <label>Funds: <input type="number" step="0.01" name="funds" value="<?= $bankFunds ?>" style="width:80px;"></label>
-        <button type="submit">Set</button>
+      <span>Balance: [<a href="fund_history.php">$<?= number_format($bankFunds, 2) ?></a>]</span>
+      <form action="/wbt/api/deposit.php" method="POST" style="display:flex;gap:6px;align-items:center;margin-left:10px;">
+        <input type="number" step="0.01" name="funds" placeholder="Amount" style="width:80px;">
+        <button type="submit">Deposit</button>
       </form>
     </div>
   </div>
@@ -58,10 +74,11 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       <p><strong>Note:</strong> <?= htmlspecialchars($task['note'] ?? '—') ?></p>
       <p><strong>Comment:</strong> <?= htmlspecialchars($task['comment'] ?? '—') ?></p>
       <a href="/wbt/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download submission</a>
-		<div>      
-		<form action="/wbt/api/approve.php" method="POST">
+      <div>
+      <form action="/wbt/api/approve.php" method="POST">
         <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
         <input type="hidden" name="passcode" value="<?= $task['assigned_to'] ?>">
+        <input type="number" step="0.01" name="payout" value="<?= $task['payout_amount'] ?>" style="width:80px;"> 
         <button type="submit">Approve & Pay</button>
       </form>
       <form action="/wbt/api/reject.php" method="POST" style="margin-top:5px;">

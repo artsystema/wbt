@@ -62,3 +62,11 @@ CREATE TABLE payouts (
   amount DECIMAL(10,2) NOT NULL,
   paid_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE fund_transactions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  txn_type ENUM('deposit','payout') NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  description VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
