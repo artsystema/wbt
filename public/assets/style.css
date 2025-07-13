@@ -273,6 +273,22 @@ div#taskListCompleted::before {
 .user-rank-meta .user-coeff {
     font-weight: bold;
 }
+.user-rank-meta .user-rank {
+    color: purple;
+    cursor: pointer;
+}
+.user-rank-meta .user-rank:hover {
+    text-decoration: underline;
+}
+.user-rank-meta .user-star {
+    font-weight: bold;
+    color: #fbba00;
+}
 .user-rank-meta .user-coeff {
     margin-left: 2px;
+    color: green;
+    cursor: pointer;
+}
+.user-rank-meta .user-coeff:hover {
+    text-decoration: underline;
 }

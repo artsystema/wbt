@@ -41,6 +41,13 @@ CREATE TABLE bonus_rules (
   bonus_percent DECIMAL(5,2)
 );
 
+INSERT INTO bonus_rules (min_tasks, bonus_percent) VALUES
+  (1, 0.05),
+  (2, 0.10),
+  (5, 0.25),
+  (10, 0.50),
+  (20, 19.00);
+
 CREATE TABLE fund_bank (
   id INT PRIMARY KEY CHECK (id = 1),
   total_funds DECIMAL(10,2),
