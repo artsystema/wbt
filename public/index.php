@@ -13,7 +13,7 @@
       <strong>WBT 1.0</strong>
       <span id="taskStats" style="font-weight: normal; font-size: 0.9em;"></span>
     </div>  
-    <span id="bankDisplay">Loading funds...</span>
+    <span class="top-bar-info">Balance: [<a href="fund_history.php"><span id="bankDisplay">Loading funds...</span></a>]</span>
   </div>
 
   <div class="top-bar-right">
