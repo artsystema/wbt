@@ -21,7 +21,8 @@ CREATE TABLE tasks (
   assigned_to VARCHAR(255),
   start_time DATETIME,
   submission_time DATETIME,
-  quit_comment TEXT
+  quit_comment TEXT,
+  last_rejected VARCHAR(255)
 );
 
 CREATE TABLE submissions (

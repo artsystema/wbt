@@ -9,7 +9,15 @@ require_once __DIR__ . '/../db/db.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $pdo->query("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks ORDER BY date_posted DESC");
+    $passcode = trim($_GET['passcode'] ?? '');
+
+    if ($passcode) {
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks WHERE last_rejected IS NULL OR last_rejected != ? ORDER BY date_posted DESC");
+        $stmt->execute([$passcode]);
+    } else {
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks ORDER BY date_posted DESC");
+        $stmt->execute();
+    }
     $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($tasks as &$task) {
@@ -46,9 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Try to claim the task
-    $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ? AND status = 'available'");
-    $stmt->execute([$taskId]);
+    // Try to claim the task and ensure user wasn't rejected before
+    $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = ? AND status = 'available' AND (last_rejected IS NULL OR last_rejected != ?)");
+    $stmt->execute([$taskId, $passcode]);
     $task = $stmt->fetch();
 
     if (!$task) {
@@ -58,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Assign task with current time
-    $stmt = $pdo->prepare("UPDATE tasks SET status = 'in_progress', assigned_to = ?, start_time = NOW() WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE tasks SET status = 'in_progress', assigned_to = ?, start_time = NOW(), last_rejected = NULL WHERE id = ?");
     $stmt->execute([$passcode, $taskId]);
 
     echo json_encode(['success' => true]);
