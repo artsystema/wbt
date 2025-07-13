@@ -15,6 +15,13 @@ $pending = $stmt->fetchAll();
 // Get all tasks (for listing + edit/delete)
 $stmt = $pdo->query("SELECT * FROM tasks ORDER BY date_posted DESC");
 $tasks = $stmt->fetchAll();
+
+// Stats for top bar
+$availableCount = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status = 'available'")->fetchColumn();
+$inProgressCount = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status = 'in_progress'")->fetchColumn();
+$completedCount = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")->fetchColumn();
+$userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetchColumn() ?: 0;
 ?>
 <!DOCTYPE html>
 <html>
@@ -23,7 +30,22 @@ $tasks = $stmt->fetchAll();
   <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
 <body class="admin">
-  <h3>Admin Panel: Task Management</h3>
+  <div id="top-bar">
+    <div class="top-bar-left">
+      <div class="top-bar-icon"><img src="assets/windows-95-loading.gif" alt=""></div>
+      <div>
+        <strong>Admin Panel</strong>
+        <span class="top-bar-info">[<span style="color:green;"><strong><?= $availableCount ?></strong></span> available | <?= $inProgressCount ?> in progress | <?= $completedCount ?> completed] [users: <?= $userCount ?>]</span>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <form action="/wbt/api/set_fund.php" method="POST" style="display:flex;gap:6px;align-items:center;">
+        <label>Funds: <input type="number" step="0.01" name="funds" value="<?= $bankFunds ?>" style="width:80px;"></label>
+        <button type="submit">Set</button>
+      </form>
+    </div>
+  </div>
+  <h3 style="margin-top:70px;">Admin Panel: Task Management</h3>
 <h4>Pending Reviews</h4>
 <?php if (empty($pending)): ?>
   <p>No tasks awaiting review.</p>
