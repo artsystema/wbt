@@ -1,5 +1,86 @@
 <?php
+session_start();
 require_once __DIR__ . '/../db/db.php';
+
+$stmt = $pdo->query("SELECT password_hash FROM admin_user WHERE id = 1");
+$adminHash = $stmt->fetchColumn() ?: '';
+
+if (isset($_POST['logout'])) {
+    unset($_SESSION['admin_logged_in']);
+    header('Location: admin.php');
+    exit;
+}
+
+if (!$adminHash) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pass = trim($_POST['new_pass'] ?? '');
+        $confirm = trim($_POST['confirm_pass'] ?? '');
+        if ($pass !== '' && $pass === $confirm) {
+            $hash = password_hash($pass, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO admin_user (id, password_hash) VALUES (1, ?) ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash)");
+            $stmt->execute([$hash]);
+            $_SESSION['admin_logged_in'] = true;
+            header('Location: admin.php');
+            exit;
+        } else {
+            $setupError = 'Passwords do not match';
+        }
+    }
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Admin Setup</title>
+        <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
+    </head>
+    <body>
+    <div class="login-container">
+        <h3>Set Admin Password</h3>
+        <?php if (!empty($setupError)) echo '<p style="color:red;">'.htmlspecialchars($setupError).'</p>'; ?>
+        <form method="POST">
+            <input type="password" name="new_pass" placeholder="Password" required>
+            <input type="password" name="confirm_pass" placeholder="Confirm" required>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
+if (!($_SESSION['admin_logged_in'] ?? false)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $pass = $_POST['password'] ?? '';
+        if (password_verify($pass, $adminHash)) {
+            $_SESSION['admin_logged_in'] = true;
+            header('Location: admin.php');
+            exit;
+        } else {
+            $loginError = 'Invalid password';
+        }
+    }
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Admin Login</title>
+        <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
+    </head>
+    <body>
+    <div class="login-container">
+        <h3>Admin Login</h3>
+        <?php if (!empty($loginError)) echo '<p style="color:red;">'.htmlspecialchars($loginError).'</p>'; ?>
+        <form method="POST">
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
 
 // Get pending review tasks with submission info
 $stmt = $pdo->query("
@@ -58,6 +139,10 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       <form action="/wbt/api/deposit.php" method="POST" style="display:flex;gap:6px;align-items:center;margin-left:10px;">
         <input type="number" step="0.01" name="funds" placeholder="Amount" style="width:80px;">
         <button type="submit">Deposit</button>
+      </form>
+      <form action="admin.php" method="POST" style="margin-left:10px;display:inline;">
+        <input type="hidden" name="logout" value="1">
+        <button type="submit">Logout</button>
       </form>
     </div>
   </div>

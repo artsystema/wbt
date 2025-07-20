@@ -70,3 +70,10 @@ CREATE TABLE fund_transactions (
   description VARCHAR(255),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE admin_user (
+  id INT PRIMARY KEY,
+  password_hash VARCHAR(255) NOT NULL
+);
+
+INSERT INTO admin_user (id, password_hash) VALUES (1, '');
