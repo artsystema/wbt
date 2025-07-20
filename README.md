@@ -1,15 +1,27 @@
-# WBT
+# WBT - Web-based Task Tracker
 
-Web-based Task Tracker (WBT) is a small PHP application for posting and tracking simple tasks. Workers claim tasks with a passcode and submit their results for review.
+WBT is a lightweight PHP application backed by MySQL for posting small jobs and tracking their completion. Workers claim tasks with a passcode, upload a result and the administrator reviews the submission and pays out from a shared fund.
+
+## Features
+
+- Task listing with category filtering
+- Claiming tasks using a simple passcode
+- Countdown timer and automatic reset of expired jobs
+- File upload when submitting work
+- Administrator panel for posting, editing and deleting tasks
+- Review queue for approving or rejecting submissions
+- Fund bank with deposit and payout history
+- Worker statistics and basic history pages
 
 ## Requirements
 
 - PHP 8 or later
 - MySQL (or MariaDB)
+- A web server capable of running PHP scripts
 
 ## Installation
 
-1. Import `db/schema.sql` into a new database.
+1. Import `db/schema.sql` into a new database:
    ```bash
    mysql -u root -p < db/schema.sql
    ```
@@ -19,22 +31,39 @@ Web-based Task Tracker (WBT) is a small PHP application for posting and tracking
    ```bash
    php -S localhost:8000 -t public
    ```
-5. Visit `http://localhost:8000` in your browser. The admin panel is available at `http://localhost:8000/admin.php`.
+5. Visit `http://localhost:8000` to view the worker interface. The administrator interface is at `http://localhost:8000/admin.php`.
+
+### Optional
+
+- Schedule `api/cron_check_expired.php` via cron to periodically reset long running tasks.
 
 ## Project Structure
 
 ```
-public/  - front-end pages and assets
-api/     - PHP endpoints used by the interface
-db/      - database connection and schema
-uploads/ - created at runtime for attachments and submissions
+public/      - front‑end pages and static assets
+api/         - PHP endpoints powering the interface
+db/          - database connection script and schema
+uploads/     - created at runtime for attachments and submissions
+SUGGESTED_TASKS.md - ideas for future improvements
 ```
+
+### Important Files
+
+- `public/index.php` – main task listing UI
+- `public/admin.php` – administrator panel
+- `public/history.php` – view a worker's task history
+- `public/fund_history.php` – list of deposit and payout transactions
+- `api/tasks.php` – list tasks and claim new ones
+- `api/submit.php` – submit work for review
+- `api/approve.php` and `api/reject.php` – admin actions on submissions
+- `api/fund.php` and `api/deposit.php` – manage the fund bank
 
 ## Basic Workflow
 
-1. The admin posts tasks from the admin panel.
+1. The administrator posts tasks from the admin panel and adds funds to the bank.
 2. Workers authorize with a passcode and claim available tasks.
-3. When done, they upload a file and optional comment.
-4. The admin approves or rejects submissions. Approved tasks deduct their reward from the fund bank.
+3. When finished they upload a file and optional comment which places the job in the review queue.
+4. The administrator approves or rejects submissions. Approved jobs deduct their reward from the fund and optionally apply bonus rules.
+5. Workers can view their own history and statistics.
 
-This repository provides a simple starting point and is not yet production ready. Use it as a prototype or adapt it to your needs.
+This project is intended as a simple prototype. Review the code and security considerations carefully before deploying in a production environment.
