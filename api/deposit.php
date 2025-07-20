@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!($_SESSION['admin_logged_in'] ?? false)) {
+    http_response_code(403);
+    echo 'Unauthorized';
+    exit;
+}
 require_once __DIR__ . '/../db/db.php';
 
 

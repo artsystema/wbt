@@ -301,3 +301,18 @@ div#taskListCompleted::before {
 .user-rank-meta .user-coeff:hover {
     text-decoration: underline;
 }
+
+/* ===== Admin Login ===== */
+.login-container {
+    margin: 120px auto;
+    max-width: 300px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #999;
+    text-align: center;
+}
+
+.login-container input {
+    width: 100%;
+    margin-bottom: 10px;
+}
