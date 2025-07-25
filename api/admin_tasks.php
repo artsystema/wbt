@@ -73,5 +73,5 @@ switch ($action) {
     break;
 }
 
-header("Location: /wbt/public/admin.php");
+header("Location: /admin.php");
 exit;

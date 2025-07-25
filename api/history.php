@@ -18,7 +18,7 @@ foreach ($tasks as &$task) {
     if (is_dir($dir)) {
         foreach (scandir($dir) as $file) {
             if ($file !== '.' && $file !== '..') {
-                $attachments[] = "/wbt/uploads/{$task['id']}/in/{$file}";
+                $attachments[] = "/uploads/{$task['id']}/in/{$file}";
             }
         }
     }
@@ -29,7 +29,7 @@ foreach ($tasks as &$task) {
         $subStmt->execute([$task['id']]);
         if ($sub = $subStmt->fetch(PDO::FETCH_ASSOC)) {
             $task['submission'] = [
-                'file' => '/wbt/uploads/' . $sub['file_path'],
+                'file' => '/uploads/' . $sub['file_path'],
                 'comment' => $sub['comment'],
                 'submitted_at' => $sub['submitted_at']
             ];

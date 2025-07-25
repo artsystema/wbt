@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../db/db.php';
+require_once __DIR__ . '/db/db.php';
 
 $stmt = $pdo->query("SELECT txn_type, amount, description, created_at FROM fund_transactions ORDER BY created_at DESC");
 $transactions = $stmt->fetchAll();

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../db/db.php';
+require_once __DIR__ . '/db/db.php';
 
 $passcode = trim($_GET['user'] ?? $_GET['passcode'] ?? '');
 if (!$passcode) {
