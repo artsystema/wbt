@@ -87,6 +87,10 @@ span > strong:hover {
 .admin > .task {
     grid-template-columns: .5fr 2.5fr .5fr .5fr .5fr .5fr;
 }
+.admin > .review-task {
+    grid-template-columns: .5fr 1fr 3fr .5fr;
+    margin-bottom: 16px;
+}
 .task:nth-child(odd) {
     background-color: #dfdfdf;
 }
