@@ -146,31 +146,31 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       </form>
     </div>
   </div>
-  <h3 style="margin-top:70px;">Admin Panel: Task Management</h3>
-<h4>Pending Reviews</h4>
+  <h4 style="margin-top:70px;">Pending Reviews</h4>
 <?php if (empty($pending)): ?>
   <p>No tasks awaiting review.</p>
 <?php else: ?>
   <?php foreach ($pending as $task): ?>
-    <div class="task" style="border:2px solid orange;">
-      <div><strong><?= htmlspecialchars($task['title']) ?> (Pending) </strong></div>
-      <p><strong>User:</strong> <?= htmlspecialchars($task['assigned_to']) ?></p>
-      <p><strong>Submitted:</strong> <?= $task['submitted_at'] ?></p>
-      <p><strong>Note:</strong> <?= htmlspecialchars($task['note'] ?? '—') ?></p>
-      <p><strong>Comment:</strong> <?= htmlspecialchars($task['comment'] ?? '—') ?></p>
-      <a href="/wbt/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download submission</a>
+    <div class="task review-task">
+      <div><strong><?= htmlspecialchars($task['title']) ?></strong></div>
       <div>
-      <form action="/wbt/api/approve.php" method="POST">
-        <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
-        <input type="hidden" name="passcode" value="<?= $task['assigned_to'] ?>">
-        <input type="number" step="0.01" name="payout" value="<?= $task['payout_amount'] ?>" style="width:80px;"> 
-        <button type="submit">Approve & Pay</button>
-      </form>
-      <form action="/wbt/api/reject.php" method="POST" style="margin-top:5px;">
-        <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
-        <button type="submit" onclick="return confirm('Reject and relist this task?')">Reject</button>
-      </form></div>	  
-
+        <?= htmlspecialchars($task['assigned_to']) ?><br>
+        <span class="task-meta"><?= $task['submitted_at'] ?></span>
+      </div>
+      <div><?= htmlspecialchars($task['comment'] ?? '—') ?></div>
+      <div>
+        <a href="/wbt/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download</a>
+        <form action="/wbt/api/approve.php" method="POST" style="margin-top:4px;">
+          <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
+          <input type="hidden" name="passcode" value="<?= $task['assigned_to'] ?>">
+          <input type="number" step="0.01" name="payout" value="<?= $task['payout_amount'] ?>" style="width:80px;">
+          <button type="submit">Approve & Pay</button>
+        </form>
+        <form action="/wbt/api/reject.php" method="POST" style="margin-top:5px;">
+          <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
+          <button type="submit" onclick="return confirm('Reject and relist this task?')">Reject</button>
+        </form>
+      </div>
     </div>
 
   <?php endforeach; ?>
