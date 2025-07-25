@@ -136,7 +136,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
     </div>
     <div class="top-bar-right">
       <span>Balance: [<a href="fund_history.php">$<?= number_format($bankFunds, 2) ?></a>]</span>
-      <form action="/wbt/api/deposit.php" method="POST" style="display:flex;gap:6px;align-items:center;margin-left:10px;">
+      <form action="/api/deposit.php" method="POST" style="display:flex;gap:6px;align-items:center;margin-left:10px;">
         <input type="number" step="0.01" name="funds" placeholder="Amount" style="width:80px;">
         <button type="submit">Deposit</button>
       </form>
@@ -159,14 +159,14 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       </div>
       <div><?= htmlspecialchars($task['comment'] ?? '—') ?></div>
       <div>
-        <a href="/wbt/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download</a>
-        <form action="/wbt/api/approve.php" method="POST" style="margin-top:4px;">
+        <a href="/uploads/<?= htmlspecialchars($task['file_path']) ?>" target="_blank">Download</a>
+        <form action="/api/approve.php" method="POST" style="margin-top:4px;">
           <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
           <input type="hidden" name="passcode" value="<?= $task['assigned_to'] ?>">
           <input type="number" step="0.01" name="payout" value="<?= $task['payout_amount'] ?>" style="width:80px;">
           <button type="submit">Approve & Pay</button>
         </form>
-        <form action="/wbt/api/reject.php" method="POST" style="margin-top:5px;">
+        <form action="/api/reject.php" method="POST" style="margin-top:5px;">
           <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
           <button type="submit" onclick="return confirm('Reject and relist this task?')">Reject</button>
         </form>
@@ -185,7 +185,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
   <div>Time</div>
   <div>Status</div>
 </div>
-<form class="task post" action="/wbt/api/admin_tasks.php" method="POST" enctype="multipart/form-data">
+<form class="task post" action="/api/admin_tasks.php" method="POST" enctype="multipart/form-data">
   <input type="hidden" name="action" value="create">
   <div><input type="text" name="title" placeholder="Title" required></div>
   <div><textarea name="description" rows="2" placeholder="Description"></textarea> <div><label>Attachments (optional, multiple): <input type="file" name="attachments[]" multiple></label></div></div>
@@ -198,7 +198,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 <?php foreach ($tasks as $task): ?>
   <div class="task <?= $task['status'] ?>">
     <div><strong><?= htmlspecialchars($task['title']) ?></strong>
-	      <form action="/wbt/api/admin_tasks.php" method="POST" style="display:inline;">
+	      <form action="/api/admin_tasks.php" method="POST" style="display:inline;">
         <input type="hidden" name="action" value="delete">
         <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
         <button type="submit" onclick="return confirm('Delete this task?')">Delete</button>
@@ -212,7 +212,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 	
 		<?php
 			$dir = __DIR__ . "/../uploads/{$task['id']}/in";
-			$webDir = "/wbt/uploads/{$task['id']}/in";
+			$webDir = "/uploads/{$task['id']}/in";
 			if (is_dir($dir)) {
 				$files = array_diff(scandir($dir), ['.', '..']);
 				if (!empty($files)) {
@@ -220,7 +220,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 					foreach ($files as $file) {
 						$encoded = urlencode($file);
 						echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a>
-							<form action='/wbt/api/delete_attachment.php' method='POST' style='display:inline; margin-left:10px;'>
+							<form action='/api/delete_attachment.php' method='POST' style='display:inline; margin-left:10px;'>
 							<input type='hidden' name='task_id' value='{$task['id']}'>
 							<input type='hidden' name='file' value='{$file}'>
 							<button type='submit' onclick='return confirm(\"Delete this file?\")'>Delete</button>
@@ -239,7 +239,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 
       <details>
         <summary>Edit</summary>
-        <form action="/wbt/api/admin_tasks.php" method="POST">
+        <form action="/api/admin_tasks.php" method="POST">
           <input type="hidden" name="action" value="edit">
           <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
           <label>Title: <input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>"></label><br>

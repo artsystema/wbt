@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if (is_dir($dir)) {
             foreach (scandir($dir) as $file) {
                 if ($file !== '.' && $file !== '..') {
-                    $attachments[] = "/wbt/uploads/{$task['id']}/in/{$file}";
+                    $attachments[] = "/uploads/{$task['id']}/in/{$file}";
                 }
             }
         }

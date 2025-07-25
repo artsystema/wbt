@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    fetch("/wbt/api/reset_expired.php", {
+    fetch("/api/reset_expired.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "global_reset=1"
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 updateAuthDisplay();
             });
 
-            fetch(`/wbt/api/user_stats.php?passcode=${encodeURIComponent(passcode)}`)
+            fetch(`/api/user_stats.php?passcode=${encodeURIComponent(passcode)}`)
                 .then(res => res.json())
                 .then(stats => {
                     const parts = [];
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     function fetchTasks() {
-        const tasksUrl = passcode ? `/wbt/api/tasks.php?passcode=${encodeURIComponent(passcode)}` : "/wbt/api/tasks.php";
+        const tasksUrl = passcode ? `/api/tasks.php?passcode=${encodeURIComponent(passcode)}` : "/api/tasks.php";
         fetch(tasksUrl)
             .then(res => res.json())
             .then(tasks => {
@@ -335,7 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             takeBtn.addEventListener("click", (e) => {
                                 e.stopPropagation();
                                 if (!passcode) return alert("Enter passcode first.");
-                                fetch("/wbt/api/tasks.php", {
+                                fetch("/api/tasks.php", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ task_id: task.id, passcode })
@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             if (noteField) formData.append("comment", noteField.value);
 
-                            fetch("/wbt/api/submit.php", {
+                            fetch("/api/submit.php", {
                                 method: "POST",
                                 body: formData
                             })
@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                                 const noteField = div.querySelector(".noteField");
                                 const comment = noteField ? noteField.value : "";
-                                fetch("/wbt/api/quit_task.php", {
+                                fetch("/api/quit_task.php", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({ task_id: task.id, passcode, comment })
@@ -414,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
 
-        fetch("/wbt/api/fund.php")
+        fetch("/api/fund.php")
             .then(res => res.json())
             .then(bank => {
                 const text = `$${bank.available} available`;
@@ -427,7 +427,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function getFileIcon(file) {
         const ext = file.split('.').pop().toLowerCase();
         const known = ['pdf', 'jpg', 'png', 'zip', 'docx', 'txt', 'csv', 'mp4', 'wav', 'ai', 'psd', 'blend', 'obj'];
-        return `/wbt/assets/icons/filetypes/${known.includes(ext) ? ext : 'default'}.png`;
+        return `/assets/icons/filetypes/${known.includes(ext) ? ext : 'default'}.png`;
     }
 
     function updateCountdowns() {
@@ -444,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (!el.dataset.reset && taskId && passcode) {
                     el.dataset.reset = "true";
-                    fetch("/wbt/api/reset_expired.php", {
+                    fetch("/api/reset_expired.php", {
                         method: "POST",
                         headers: { "Content-Type": "application/x-www-form-urlencoded" },
                         body: `task_id=${taskId}&passcode=${encodeURIComponent(passcode)}`
@@ -480,7 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     setInterval(() => {
-        fetch("/wbt/api/reset_expired.php", {
+        fetch("/api/reset_expired.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"

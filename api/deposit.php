@@ -24,6 +24,6 @@ $stmt->execute([$amount]);
 
 $pdo->commit();
 
-header("Location: /wbt/admin.php");
+header("Location: /admin.php");
 exit;
 ?>

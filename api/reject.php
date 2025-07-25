@@ -29,5 +29,5 @@ $stmt->execute([$rejectedUser, $taskId]);
 $stmt = $pdo->prepare("DELETE FROM submissions WHERE task_id = ?");
 $stmt->execute([$taskId]);
 
-header("Location: /wbt/admin.php");
+header("Location: /admin.php");
 exit;
