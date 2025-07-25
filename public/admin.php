@@ -151,7 +151,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
   <p>No tasks awaiting review.</p>
 <?php else: ?>
   <?php foreach ($pending as $task): ?>
-    <div class="task review-task">
+    <div class="task review-task pending_review">
       <div><strong><?= htmlspecialchars($task['title']) ?></strong></div>
       <div>
         <?= htmlspecialchars($task['assigned_to']) ?><br>
@@ -196,7 +196,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
   <div><button type="submit">Add Task</button></div>
 </form>
 <?php foreach ($tasks as $task): ?>
-  <div class="task">
+  <div class="task <?= $task['status'] ?>">
     <div><strong><?= htmlspecialchars($task['title']) ?></strong>
 	      <form action="/wbt/api/admin_tasks.php" method="POST" style="display:inline;">
         <input type="hidden" name="action" value="delete">
