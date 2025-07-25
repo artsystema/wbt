@@ -20,7 +20,7 @@ $path = __DIR__ . "/../uploads/$taskId/in/$file";
 
 if (is_file($path)) {
     unlink($path);
-    header("Location: /wbt/public/admin.php");
+    header("Location: /wbt/admin.php");
     exit;
 } else {
     http_response_code(404);

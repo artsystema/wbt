@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../db/db.php';
+require_once __DIR__ . '/db/db.php';
 
 $stmt = $pdo->query("SELECT password_hash FROM admin_user WHERE id = 1");
 $adminHash = $stmt->fetchColumn() ?: '';

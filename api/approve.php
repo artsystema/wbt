@@ -67,5 +67,5 @@ $stmt->execute([$passcode, $total]);
 
 $pdo->commit();
 
-header("Location: /wbt/public/admin.php");
+header("Location: /wbt/admin.php");
 exit;
