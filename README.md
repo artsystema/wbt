@@ -27,9 +27,9 @@ WBT is a lightweight PHP application backed by MySQL for posting small jobs and 
    ```
 2. Edit `db/db.php` with your database credentials.
 3. Create an `uploads/` directory in the project root and make sure the web server can write to it.
-4. Serve the `public/` directory. For local testing you can run:
+4. Serve the project root directory. For local testing you can run:
    ```bash
-   php -S localhost:8000 -t public
+   php -S localhost:8000
    ```
 5. Visit `http://localhost:8000` to view the worker interface. The administrator interface is at `http://localhost:8000/admin.php`.
 
@@ -40,7 +40,7 @@ WBT is a lightweight PHP application backed by MySQL for posting small jobs and 
 ## Project Structure
 
 ```
-public/      - front‑end pages and static assets
+assets/      - front-end assets (fonts, icons, scripts)
 api/         - PHP endpoints powering the interface
 db/          - database connection script and schema
 uploads/     - created at runtime for attachments and submissions
@@ -49,10 +49,10 @@ SUGGESTED_TASKS.md - ideas for future improvements
 
 ### Important Files
 
-- `public/index.php` – main task listing UI
-- `public/admin.php` – administrator panel
-- `public/history.php` – view a worker's task history
-- `public/fund_history.php` – list of deposit and payout transactions
+- `index.php` – main task listing UI
+- `admin.php` – administrator panel
+- `history.php` – view a worker's task history
+- `fund_history.php` – list of deposit and payout transactions
 - `api/tasks.php` – list tasks and claim new ones
 - `api/submit.php` – submit work for review
 - `api/approve.php` and `api/reject.php` – admin actions on submissions
