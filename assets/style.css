@@ -322,3 +322,30 @@ div#taskListCompleted::before {
     width: 100%;
     margin-bottom: 10px;
 }
+
+/* ===== Mobile Layout ===== */
+@media (max-width: 600px) {
+    /* Hide header row */
+    #taskList .header {
+        display: none;
+    }
+
+    /* Remove borders on list containers */
+    #taskList,
+    #taskListCompleted {
+        border: none;
+    }
+
+    /* Stack task fields vertically and draw a border around each task */
+    .task {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        border: 1px solid #afafaf;
+        margin-bottom: 12px;
+    }
+
+    .task > div {
+        white-space: normal;
+    }
+}
