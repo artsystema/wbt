@@ -108,8 +108,8 @@ foreach ($pending as &$p) {
 }
 unset($p);
 
-// Get all tasks (for listing + edit/delete)
-$stmt = $pdo->query("SELECT * FROM tasks ORDER BY date_posted DESC");
+// Get all tasks except those pending review (for listing + edit/delete)
+$stmt = $pdo->query("SELECT * FROM tasks WHERE status != 'pending_review' ORDER BY date_posted DESC");
 $tasks = $stmt->fetchAll();
 
 // Stats for top bar
