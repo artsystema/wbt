@@ -89,7 +89,7 @@ span > strong:hover {
 }
 .admin > .review-task {
     grid-template-columns: .5fr 1fr 3fr .5fr;
-    margin-bottom: 0;
+    margin-bottom: 4px;
     row-gap: 0;
     border: 2px solid orange;
 }
