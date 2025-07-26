@@ -6,6 +6,7 @@ if (!($_SESSION['admin_logged_in'] ?? false)) {
     exit;
 }
 require_once __DIR__ . '/../db/db.php';
+date_default_timezone_set('UTC');
 
 $taskId = intval($_POST['task_id'] ?? 0);
 $passcode = trim($_POST['passcode'] ?? '');
@@ -54,7 +55,7 @@ $stmt = $pdo->prepare("INSERT IGNORE INTO users (passcode) VALUES (?)");
 $stmt->execute([$passcode]);
 
 // Deduct from fund
-$stmt = $pdo->prepare("UPDATE fund_bank SET total_funds = total_funds - ?, last_updated = NOW() WHERE id = 1");
+$stmt = $pdo->prepare("UPDATE fund_bank SET total_funds = total_funds - ?, last_updated = UTC_TIMESTAMP() WHERE id = 1");
 $stmt->execute([$total]);
 
 // Record fund transaction
@@ -62,7 +63,7 @@ $stmt = $pdo->prepare("INSERT INTO fund_transactions (txn_type, amount, descript
 $stmt->execute([$total, 'Task ' . $taskId]);
 
 // Record payout
-$stmt = $pdo->prepare("INSERT INTO payouts (passcode, amount, paid_at) VALUES (?, ?, NOW())");
+$stmt = $pdo->prepare("INSERT INTO payouts (passcode, amount, paid_at) VALUES (?, ?, UTC_TIMESTAMP())");
 $stmt->execute([$passcode, $total]);
 
 $pdo->commit();

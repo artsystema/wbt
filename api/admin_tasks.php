@@ -6,6 +6,7 @@ if (!($_SESSION['admin_logged_in'] ?? false)) {
     exit;
 }
 require_once __DIR__ . '/../db/db.php';
+date_default_timezone_set('UTC');
 
 $action = $_POST['action'] ?? '';
 $title = trim($_POST['title'] ?? '');
@@ -42,7 +43,7 @@ function handleUploads($taskId): array {
 
 switch ($action) {
   case 'create':
-    $stmt = $pdo->prepare("INSERT INTO tasks (title, description, reward, estimated_minutes, date_posted, category) VALUES (?, ?, ?, ?, NOW(), ?)");
+    $stmt = $pdo->prepare("INSERT INTO tasks (title, description, reward, estimated_minutes, date_posted, category) VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), ?)");
     $stmt->execute([$title, $description, $reward, $minutes, $category]);
     $taskId = $pdo->lastInsertId(); // get inserted task id
     $attachments = handleUploads($taskId);

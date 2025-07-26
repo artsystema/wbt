@@ -13,10 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // GLOBAL reset (from any user opening the page)
     if (isset($_POST['global_reset'])) {
         $stmt = $pdo->prepare("
-            UPDATE tasks 
-            SET status = 'available', assigned_to = NULL, start_time = NULL 
-            WHERE status = 'in_progress' 
-            AND TIMESTAMPDIFF(MINUTE, start_time, NOW()) > estimated_minutes
+            UPDATE tasks
+            SET status = 'available', assigned_to = NULL, start_time = NULL
+            WHERE status = 'in_progress'
+            AND TIMESTAMPDIFF(MINUTE, start_time, UTC_TIMESTAMP()) > estimated_minutes
         ");
         $stmt->execute();
 
