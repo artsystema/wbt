@@ -196,62 +196,87 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
   <div><button type="submit">Add Task</button></div>
 </form>
 <?php foreach ($tasks as $task): ?>
-  <div class="task <?= $task['status'] ?>">
-    <div><strong><?= htmlspecialchars($task['title']) ?></strong>
-	      <form action="/api/admin_tasks.php" method="POST" style="display:inline;">
-        <input type="hidden" name="action" value="delete">
-        <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
-        <button type="submit" onclick="return confirm('Delete this task?')">Delete</button>
-      </form>
-	
-	</div>
-    <div><?= nl2br(htmlspecialchars($task['description'])) ?>
-      <?php if (!empty($task['quit_comment'])): ?>
-        <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
-      <?php endif; ?>
-	
-		<?php
-			$dir = __DIR__ . "/../uploads/{$task['id']}/in";
-			$webDir = "/uploads/{$task['id']}/in";
-			if (is_dir($dir)) {
-				$files = array_diff(scandir($dir), ['.', '..']);
-				if (!empty($files)) {
-					echo "<div><strong>Attachments:</strong><ul>";
-					foreach ($files as $file) {
-						$encoded = urlencode($file);
-						echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a>
-							<form action='/api/delete_attachment.php' method='POST' style='display:inline; margin-left:10px;'>
-							<input type='hidden' name='task_id' value='{$task['id']}'>
-							<input type='hidden' name='file' value='{$file}'>
-							<button type='submit' onclick='return confirm(\"Delete this file?\")'>Delete</button>
-							</form></li>";
-						}
-					echo "</ul></div>";
-				}
-			}
-		?>
-	</div>
-    <div><?= htmlspecialchars($task['category'] ?? '') ?></div>
-    <div>$<?= $task['reward'] ?></div>
-    <div><?= $task['estimated_minutes'] ?> min</div>
-    <div><?= $task['status'] ?></div>
-    <div class="details">
-
-      <details>
-        <summary>Edit</summary>
-        <form action="/api/admin_tasks.php" method="POST">
-          <input type="hidden" name="action" value="edit">
+  <?php if ($task['status'] === 'completed'): ?>
+    <div class="task <?= $task['status'] ?>">
+      <div><strong><?= htmlspecialchars($task['title']) ?></strong>
+        <form action="/api/admin_tasks.php" method="POST" style="display:inline;">
+          <input type="hidden" name="action" value="delete">
           <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
-          <label>Title: <input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>"></label><br>
-          <label>Description:<br><textarea name="description" rows="4" cols="50"><?= htmlspecialchars($task['description']) ?></textarea></label><br>
-          <label>Category: <input type="text" name="category" value="<?= htmlspecialchars($task['category'] ?? '') ?>"></label><br>
-          <label>Reward: <input type="number" step="0.01" name="reward" value="<?= $task['reward'] ?>"></label><br>
-          <label>Minutes: <input type="number" name="minutes" value="<?= $task['estimated_minutes'] ?>"></label><br>
-          <button type="submit">Save</button>
+          <button type="submit" onclick="return confirm('Delete this task?')">Delete</button>
         </form>
-      </details>
+      </div>
+      <div><?= nl2br(htmlspecialchars($task['description'])) ?>
+        <?php if (!empty($task['quit_comment'])): ?>
+          <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
+        <?php endif; ?>
+        <?php
+            $dir = __DIR__ . "/../uploads/{$task['id']}/in";
+            $webDir = "/uploads/{$task['id']}/in";
+            if (is_dir($dir)) {
+                $files = array_diff(scandir($dir), ['.', '..']);
+                if (!empty($files)) {
+                    echo "<div><strong>Attachments:</strong><ul>";
+                    foreach ($files as $file) {
+                        $encoded = urlencode($file);
+                        echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a></li>";
+                    }
+                    echo "</ul></div>";
+                }
+            }
+        ?>
+      </div>
+      <div><?= htmlspecialchars($task['category'] ?? '') ?></div>
+      <div>$<?= $task['reward'] ?></div>
+      <div><?= $task['estimated_minutes'] ?> min</div>
+      <div><?= $task['status'] ?></div>
     </div>
-  </div>
+  <?php else: ?>
+    <form class="task edit <?= $task['status'] ?>" action="/api/admin_tasks.php" method="POST" enctype="multipart/form-data" id="edit-<?= $task['id'] ?>">
+      <input type="hidden" name="action" value="edit">
+      <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
+      <div><input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>" required></div>
+      <div>
+        <textarea name="description" rows="2"><?= htmlspecialchars($task['description']) ?></textarea>
+        <?php if (!empty($task['quit_comment'])): ?>
+          <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
+        <?php endif; ?>
+        <?php
+            $dir = __DIR__ . "/../uploads/{$task['id']}/in";
+            $webDir = "/uploads/{$task['id']}/in";
+            $extraForms = '';
+            if (is_dir($dir)) {
+                $files = array_diff(scandir($dir), ['.', '..']);
+                if (!empty($files)) {
+                    echo "<div><strong>Attachments:</strong><ul>";
+                    $i = 0;
+                    foreach ($files as $file) {
+                        $encoded = urlencode($file);
+                        $fid = "del-{$task['id']}-{$i}";
+                        echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a>";
+                        echo " <button type='submit' form='{$fid}' style='margin-left:10px;' onclick='return confirm(\"Delete this file?\")'>Delete</button></li>";
+                        $extraForms .= "<form id='{$fid}' action='/api/delete_attachment.php' method='POST' style='display:none;'>";
+                        $extraForms .= "<input type='hidden' name='task_id' value='{$task['id']}'>";
+                        $extraForms .= "<input type='hidden' name='file' value='{$file}'>";
+                        $extraForms .= "</form>";
+                        $i++;
+                    }
+                    echo "</ul></div>";
+                }
+            }
+        ?>
+        <div><label>Attach new: <input type="file" name="attachments[]" multiple></label></div>
+      </div>
+      <div><input type="text" name="category" value="<?= htmlspecialchars($task['category'] ?? '') ?>"></div>
+      <div><input type="number" step="0.01" name="reward" value="<?= $task['reward'] ?>"></div>
+      <div><input type="number" name="minutes" value="<?= $task['estimated_minutes'] ?>"></div>
+      <div><?= $task['status'] ?></div>
+      <div>
+        <button type="submit">Save</button>
+        <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="delete" onclick="return confirm('Delete this task?')">Delete</button>
+      </div>
+    </form>
+    <?= $extraForms ?>
+  <?php endif; ?>
 <?php endforeach; ?>
 </body>
 </html>
