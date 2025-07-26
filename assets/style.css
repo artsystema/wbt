@@ -197,6 +197,9 @@ div#taskListCompleted::before {
 }
 
 /* ===== Attachments & Previews ===== */
+textarea {
+    width: -webkit-fill-available;
+}
 .attachments {
     margin-top: 0.3em;
     font-size: 0.9em;
