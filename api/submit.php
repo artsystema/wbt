@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../db/db.php';
+date_default_timezone_set('UTC');
 
 $passcode = $_POST['passcode'] ?? '';
 $taskId = intval($_POST['task_id'] ?? 0);
@@ -37,10 +38,10 @@ if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $targetPath)) {
 // Mark task pending and create submission
 $pdo->beginTransaction();
 
-$stmt = $pdo->prepare("UPDATE tasks SET status = 'pending_review', submission_time = NOW() WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE tasks SET status = 'pending_review', submission_time = UTC_TIMESTAMP() WHERE id = ?");
 $stmt->execute([$taskId]);
 
-$stmt = $pdo->prepare("INSERT INTO submissions (task_id, user_passcode, file_path, comment, submitted_at) VALUES (?, ?, ?, ?, NOW())");
+$stmt = $pdo->prepare("INSERT INTO submissions (task_id, user_passcode, file_path, comment, submitted_at) VALUES (?, ?, ?, ?, UTC_TIMESTAMP())");
 $stmt->execute([$taskId, $passcode, $uniqueName, $comment]);
 
 $pdo->commit();

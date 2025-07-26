@@ -7,6 +7,8 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../db/db.php';
 header('Content-Type: application/json');
+// Ensure consistent timezone handling
+date_default_timezone_set('UTC');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $passcode = trim($_GET['passcode'] ?? '');
@@ -31,6 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         }
         $task['attachments'] = $attachments;
+
+        // Convert start_time to ISO-8601 UTC so the client interprets it correctly
+        if ($task['start_time']) {
+            $task['start_time'] = gmdate('c', strtotime($task['start_time']));
+        }
 
         if ($task['status'] === 'pending_review') {
             $stmtSub = $pdo->prepare("SELECT comment FROM submissions WHERE task_id = ? ORDER BY submitted_at DESC LIMIT 1");
@@ -65,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Assign task with current time
-    $stmt = $pdo->prepare("UPDATE tasks SET status = 'in_progress', assigned_to = ?, start_time = NOW(), last_rejected = NULL WHERE id = ?");
+    // Assign task with current UTC time to avoid timezone mismatches
+    $stmt = $pdo->prepare("UPDATE tasks SET status = 'in_progress', assigned_to = ?, start_time = UTC_TIMESTAMP(), last_rejected = NULL WHERE id = ?");
     $stmt->execute([$passcode, $taskId]);
 
     echo json_encode(['success' => true]);
