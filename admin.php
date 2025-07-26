@@ -211,7 +211,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
           <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
         <?php endif; ?>
         <?php
-            $dir = __DIR__ . "/../uploads/{$task['id']}/in";
+            $dir = __DIR__ . "/uploads/{$task['id']}/in";
             $webDir = "/uploads/{$task['id']}/in";
             if (is_dir($dir)) {
                 $files = array_diff(scandir($dir), ['.', '..']);
@@ -250,7 +250,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
           <p><strong>Last Quit:</strong> <?= htmlspecialchars($task['quit_comment']) ?></p>
         <?php endif; ?>
         <?php
-            $dir = __DIR__ . "/../uploads/{$task['id']}/in";
+            $dir = __DIR__ . "/uploads/{$task['id']}/in";
             $webDir = "/uploads/{$task['id']}/in";
             $extraForms = '';
             if (is_dir($dir)) {
