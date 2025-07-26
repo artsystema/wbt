@@ -124,6 +124,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 <head>
   <title>Admin Panel</title>
   <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
+  <script src="assets/admin.js?v=<?= time() ?>" defer></script>
 </head>
 <body class="admin">
   <div id="top-bar">
@@ -269,7 +270,17 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       <div><input type="text" name="category" value="<?= htmlspecialchars($task['category'] ?? '') ?>"></div>
       <div><input type="number" step="0.01" name="reward" value="<?= $task['reward'] ?>"></div>
       <div><input type="number" name="minutes" value="<?= $task['estimated_minutes'] ?>"></div>
-      <div><?= $task['status'] ?></div>
+      <div>
+        <?php if ($task['status'] === 'in_progress' && !empty($task['start_time'])): ?>
+          <?php
+            $endTs = strtotime($task['start_time']) + ($task['estimated_minutes'] * 60);
+            $endIso = gmdate('c', $endTs);
+          ?>
+          <span class="countdown" data-end="<?= $endIso ?>" data-estimated-ms="<?= $task['estimated_minutes'] * 60000 ?>"></span>
+        <?php else: ?>
+          <?= $task['status'] ?>
+        <?php endif; ?>
+      </div>
       <div>
         <button type="submit">Save</button>
         <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="delete" onclick="return confirm('Delete this task?')">Delete</button>
