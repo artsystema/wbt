@@ -217,9 +217,17 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
                 $files = array_diff(scandir($dir), ['.', '..']);
                 if (!empty($files)) {
                     echo "<div><strong>Attachments:</strong><ul>";
+                    $i = 0;
                     foreach ($files as $file) {
                         $encoded = urlencode($file);
-                        echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a></li>";
+                        $fid = "del-{$task['id']}-comp-{$i}";
+                        echo "<li><a href='{$webDir}/{$encoded}' target='_blank'>{$file}</a>";
+                        echo " <button type='submit' form='{$fid}' style='margin-left:10px;' onclick='return confirm(\"Delete this file?\")'>Delete</button></li>";
+                        echo "<form id='{$fid}' action='/api/delete_attachment.php' method='POST' style='display:none;'>";
+                        echo "<input type='hidden' name='task_id' value='{$task['id']}'>";
+                        echo "<input type='hidden' name='file' value='{$file}'>";
+                        echo "</form>";
+                        $i++;
                     }
                     echo "</ul></div>";
                 }
