@@ -32,7 +32,7 @@
   <div id="taskListCompleted"></div>
 
   <footer>
-    &copy; 2025 [j3]
+    &copy; 2025 <a href="http://docs.artsystema.com/" target="_blank">[j3 docs]</a>
     <a href="https://github.com/artsystema/wbt" target="_blank">
       <img src="assets/icons/github.svg" alt="GitHub">
     </a>
