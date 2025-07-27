@@ -8,7 +8,7 @@
 <body>
 <div id="top-bar">
   <div class="top-bar-left">
-    <div class="top-bar-icon"><img src="assets/windows-95-loading.gif"></div>  
+    <a class="top-bar-icon" href="apmin.php"><img src="assets/windows-95-loading.gif"></a>
     <div title="Web-based Task Tracker 1.0">
       <strong>WBT 1.0</strong>
       <span id="taskStats" style="font-weight: normal; font-size: 0.9em;"></span>

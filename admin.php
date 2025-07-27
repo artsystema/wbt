@@ -129,7 +129,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
 <body class="admin">
   <div id="top-bar">
     <div class="top-bar-left">
-      <div class="top-bar-icon"><img src="assets/windows-95-loading.gif" alt=""></div>
+      <a class="top-bar-icon" href="index.php"><img src="assets/windows-95-loading.gif" alt=""></a>
       <div>
         <strong>Admin Panel</strong>
         <span class="top-bar-info">[<span style="color:green;"><strong><?= $availableCount ?></strong></span> available | <?= $inProgressCount ?> in progress | <?= $completedCount ?> completed] [users: <?= $userCount ?>]</span>
