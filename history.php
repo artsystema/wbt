@@ -87,5 +87,11 @@ foreach ($tasks as $t) {
   <?php endif; ?>
 <?php endforeach; ?>
 </div>
+<footer>
+  &copy; 2023 [j3]
+  <a href="https://github.com/artsystema/wbt" target="_blank">
+    <img src="assets/icons/github.svg" alt="GitHub">
+  </a>
+</footer>
 </body>
 </html>

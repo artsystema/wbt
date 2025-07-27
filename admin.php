@@ -305,5 +305,13 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
     <?= $extraForms ?>
   <?php endif; ?>
 <?php endforeach; ?>
+
+<footer>
+  &copy; 2023 [j3]
+  <a href="https://github.com/artsystema/wbt" target="_blank">
+    <img src="assets/icons/github.svg" alt="GitHub">
+  </a>
+</footer>
+
 </body>
 </html>
