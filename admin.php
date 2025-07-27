@@ -237,7 +237,12 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
       <div><?= htmlspecialchars($task['category'] ?? '') ?></div>
       <div>$<?= $task['reward'] ?></div>
       <div><?= $task['estimated_minutes'] ?> min</div>
-      <div><?= $task['status'] ?></div>
+      <div>
+        <?= $task['status'] ?>
+        <?php if (!empty($task['assigned_to'])): ?>
+          <br><span class="task-meta"><?= htmlspecialchars($task['assigned_to']) ?></span>
+        <?php endif; ?>
+      </div>
     </div>
   <?php else: ?>
     <form class="task edit <?= $task['status'] ?>" action="/api/admin_tasks.php" method="POST" enctype="multipart/form-data" id="edit-<?= $task['id'] ?>">
@@ -287,6 +292,9 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
           <span class="countdown" data-end="<?= $endIso ?>" data-estimated-ms="<?= $task['estimated_minutes'] * 60000 ?>"></span>
         <?php else: ?>
           <?= $task['status'] ?>
+        <?php endif; ?>
+        <?php if (!empty($task['assigned_to'])): ?>
+          <br><span class="task-meta"><?= htmlspecialchars($task['assigned_to']) ?></span>
         <?php endif; ?>
       </div>
       <div>
