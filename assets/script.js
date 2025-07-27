@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
             let show = true;
             filters.forEach(f => {
                 if (f.type === 'category') {
-                    const cat = div.dataset.category || '';
-                    if (cat !== f.value) show = false;
+                    const cats = (div.dataset.categories || '').split('|').filter(Boolean);
+                    if (!cats.includes(f.value)) show = false;
                 } else if (f.type === 'my') {
                     const owner = div.dataset.owner;
                     const status = div.dataset.status;
@@ -205,13 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("taskStats").innerHTML = `[<span style="color:green;"><strong>${availableCount}</strong></span> available, ${inProgressCount} in progress]`;
 
                 tasks.forEach(task => {
-                    const div = document.createElement("div");
-                    div.className = "task";
-                    div.dataset.id = task.id;
-                    div.className = `task ${task.status}`;
-                    div.dataset.owner = task.assigned_to || '';
-                    div.dataset.status = task.status;
-                    div.dataset.category = task.category || '';
+                const div = document.createElement("div");
+                div.className = "task";
+                div.dataset.id = task.id;
+                div.className = `task ${task.status}`;
+                div.dataset.owner = task.assigned_to || '';
+                div.dataset.status = task.status;
+                const categories = (task.category || '').split(',').map(c => c.trim()).filter(Boolean);
+                div.dataset.categories = categories.join('|');
 
                     const isOwner = passcode && passcode === task.assigned_to;
                     const isInProgress = task.status === "in_progress";
@@ -253,12 +254,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
 
+                    const catSpans = categories.map(c => `<span class="task-category clickable">${c}</span>`).join(', ');
+
                     div.innerHTML = `
 
           <div>
             <div><strong>[${task.id}] ${task.title}</strong></div>
             <div class="task-meta">Posted on ${new Date(task.date_posted).toLocaleString()}</div>
-            <span class="task-category">${task.category || ''}</span>
+            ${catSpans}
           </div>
           <div>
   ${task.description}
@@ -291,13 +294,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <div>${statusDisplay}</div>
           <div>${actionHTML}</div>
           `;
-                    const cat = div.querySelector('.task-category');
-                    if (cat && cat.textContent.trim()) {
-                        cat.classList.add('clickable');
-                        cat.addEventListener('click', () => {
-                            addFilter('category', cat.textContent.trim(), cat.textContent.trim());
-                        });
-                    }
+                    div.querySelectorAll('.task-category').forEach(catEl => {
+                        if (catEl.textContent.trim()) {
+                            catEl.addEventListener('click', () => {
+                                addFilter('category', catEl.textContent.trim(), catEl.textContent.trim());
+                            });
+                        }
+                    });
 
                     div.querySelectorAll(".preview-toggle").forEach(btn => {
                         btn.addEventListener("click", () => {
