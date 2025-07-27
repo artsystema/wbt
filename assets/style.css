@@ -81,7 +81,7 @@ span > strong:hover {
     padding: 16px 10px;
     align-items: center;
     background-color: #ffffff6e;
-    border-bottom: 1px dotted #3b3b3b;
+    border-bottom: 1px dotted #afafaf;
     align-items: normal;
 }
 .admin > .task {
