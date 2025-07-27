@@ -44,7 +44,6 @@ assets/      - front-end assets (fonts, icons, scripts)
 api/         - PHP endpoints powering the interface
 db/          - database connection script and schema
 uploads/     - created at runtime for attachments and submissions
-SUGGESTED_TASKS.md - ideas for future improvements
 ```
 
 ### Important Files
