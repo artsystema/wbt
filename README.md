@@ -4,7 +4,7 @@ WBT is a lightweight PHP application backed by MySQL for posting small jobs and 
 
 ## Features
 
-- Task listing with category filtering
+- Task listing with category filtering (tasks may have multiple comma-separated categories)
 - Claiming tasks using a simple passcode
 - Countdown timer and automatic reset of expired jobs
 - File upload when submitting work
