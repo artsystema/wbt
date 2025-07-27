@@ -358,3 +358,18 @@ textarea {
         white-space: normal;
     }
 }
+
+/* ===== Footer ===== */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 10px;
+    font-size: 0.9em;
+    color: #333;
+}
+footer img {
+    vertical-align: middle;
+    width: 16px;
+    height: 16px;
+    margin-left: 4px;
+}
