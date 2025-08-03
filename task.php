@@ -7,7 +7,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT id, title, description, reward, estimated_minutes, date_posted, status, assigned_to, category FROM tasks WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, title, description, reward, estimated_minutes, date_posted, status, assigned_to, category, start_time FROM tasks WHERE id = ?");
 $stmt->execute([$id]);
 $task = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$task) {
@@ -29,16 +29,26 @@ if (is_dir($dir)) {
 <html>
 <head>
     <title>[<?= htmlspecialchars($task['id']) ?>] <?= htmlspecialchars($task['title']) ?></title>
+    <script src="assets/task.js?v=<?= time() ?>" defer></script>
     <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
 <body>
 <div id="top-bar">
     <div class="top-bar-left">
-        <a class="top-bar-icon" href="index.php"><img src="assets/windows-95-loading.gif" alt=""></a>
-        <div><strong>WBT 1.0</strong></div>
+        <a class="top-bar-icon" href="admin.php"><img src="assets/windows-95-loading.gif"></a>
+        <div title="Web-based Task Tracker 1.0">
+            <strong>WBT 1.0</strong>
+            <span id="taskStats" style="font-weight: normal; font-size: 0.9em;"></span>
+        </div>
+        <span class="top-bar-info">Balance: [<a href="fund_history.php"><span id="bankDisplay">Loading funds...</span></a>]</span>
     </div>
     <div class="top-bar-right">
-        <a href="index.php">Back</a>
+        <div id="authControls">
+            <input type="text" id="authField" placeholder="Enter passcode..." />
+            <button id="authBtn">Authorize</button>
+            <span id="authStatus"></span>
+        </div>
+        <a href="index.php" id="backBtn">Back</a>
     </div>
 </div>
 <div id="taskList">
@@ -48,9 +58,9 @@ if (is_dir($dir)) {
         <div>Time</div>
         <div>Reward</div>
         <div>Status</div>
-        <div>—</div>
+        <div>Action</div>
     </div>
-    <div class="task <?= htmlspecialchars($task['status']) ?>">
+    <div id="taskRow" class="task <?= htmlspecialchars($task['status']) ?>" data-id="<?= $task['id'] ?>" data-owner="<?= htmlspecialchars($task['assigned_to'] ?? '') ?>" data-status="<?= htmlspecialchars($task['status']) ?>" data-start="<?= htmlspecialchars($task['start_time'] ? gmdate('c', strtotime($task['start_time'])) : '') ?>" data-estimated-ms="<?= $task['estimated_minutes'] * 60000 ?>">
         <div>
             <div><strong>[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></strong></div>
             <div class="task-meta">Posted on <?= $task['date_posted'] ?></div>
@@ -70,8 +80,12 @@ if (is_dir($dir)) {
         </div>
         <div><?= $task['estimated_minutes'] ?> min</div>
         <div>$<?= $task['reward'] ?></div>
-        <div><?= str_replace('_', ' ', $task['status']) ?></div>
-        <div></div>
+        <div id="statusCell"><?= str_replace('_', ' ', $task['status']) ?></div>
+        <div id="actionCell">
+            <?php if ($task['status'] === 'available'): ?>
+                <button id="takeBtn" data-id="<?= $task['id'] ?>">Take</button>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 <footer>
