@@ -28,13 +28,13 @@ if (is_dir($dir)) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Task <?= htmlspecialchars($task['id']) ?></title>
+    <title>[<?= htmlspecialchars($task['id']) ?>] <?= htmlspecialchars($task['title']) ?></title>
     <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
 <body>
 <div id="top-bar">
     <div class="top-bar-left">
-        <div class="top-bar-icon"><img src="assets/windows-95-loading.gif" alt=""></div>
+        <a class="top-bar-icon" href="index.php"><img src="assets/windows-95-loading.gif" alt=""></a>
         <div><strong>WBT 1.0</strong></div>
     </div>
     <div class="top-bar-right">
@@ -57,7 +57,7 @@ if (is_dir($dir)) {
             <span class="task-category"><?= htmlspecialchars($task['category'] ?? '') ?></span>
         </div>
         <div>
-            <?= nl2br(htmlspecialchars($task['description'])) ?>
+            <?= nl2br($task['description']) ?>
             <?php if (!empty($attachments)): ?>
                 <div class="attachments"><strong>Attachments:</strong>
                     <ul>
