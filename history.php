@@ -56,7 +56,7 @@ foreach ($tasks as $t) {
   <?php if ($task['status'] !== 'completed'): ?>
     <div class="task <?= htmlspecialchars($task['status']) ?>">
       <div>
-        <div><strong>[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></strong></div>
+        <div><strong><a href="task.php?id=<?= $task['id'] ?>">[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></a></strong></div>
         <div class="task-meta">Posted on <?= $task['date_posted'] ?></div>
         <span class="task-category"><?= htmlspecialchars($task['category'] ?? '') ?></span>
       </div>
@@ -74,7 +74,7 @@ foreach ($tasks as $t) {
   <?php if ($task['status'] === 'completed'): ?>
     <div class="task completed">
       <div>
-        <div><strong>[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></strong></div>
+        <div><strong><a href="task.php?id=<?= $task['id'] ?>">[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></a></strong></div>
         <div class="task-meta">Posted on <?= $task['date_posted'] ?></div>
         <span class="task-category"><?= htmlspecialchars($task['category'] ?? '') ?></span>
       </div>

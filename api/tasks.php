@@ -12,8 +12,12 @@ date_default_timezone_set('UTC');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $passcode = trim($_GET['passcode'] ?? '');
+    $taskId   = intval($_GET['id'] ?? 0);
 
-    if ($passcode) {
+    if ($taskId) {
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks WHERE id = ?");
+        $stmt->execute([$taskId]);
+    } elseif ($passcode) {
         $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks WHERE last_rejected IS NULL OR last_rejected != ? ORDER BY date_posted DESC");
         $stmt->execute([$passcode]);
     } else {
