@@ -196,7 +196,7 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
   <div>—</div>
   <div><button type="submit">Add Task</button></div>
 </form>
-<?php foreach ($tasks as $task): ?>
+  <?php foreach ($tasks as $task): ?>
   <?php if ($task['status'] === 'completed'): ?>
     <div class="task <?= $task['status'] ?>">
       <div><strong><?= htmlspecialchars($task['title']) ?></strong>
@@ -241,6 +241,12 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
         <?= $task['status'] ?>
         <?php if (!empty($task['assigned_to'])): ?>
           <br><span class="task-meta"><?= htmlspecialchars($task['assigned_to']) ?></span>
+          <?php
+            if (!empty($task['start_time']) && !empty($task['submission_time'])) {
+              $timeTaken = round((strtotime($task['submission_time']) - strtotime($task['start_time'])) / 60);
+              echo "<br><span class=\"task-meta\">{$timeTaken} min vs {$task['estimated_minutes']} min est</span>";
+            }
+          ?>
         <?php endif; ?>
       </div>
     </div>
