@@ -118,6 +118,20 @@ $inProgressCount = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status = 'in_pr
 $completedCount = $pdo->query("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")->fetchColumn();
 $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetchColumn() ?: 0;
+
+// Format minutes to a human-readable hours/minutes string
+function formatDuration($minutes) {
+    $mins = (int) round($minutes);
+    $hrs = (int) floor($mins / 60);
+    $rem = $mins % 60;
+    if ($hrs > 0 && $rem > 0) {
+        return $hrs . 'h ' . $rem . 'm';
+    }
+    if ($hrs > 0) {
+        return $hrs . 'h';
+    }
+    return $rem . 'm';
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -243,8 +257,10 @@ $bankFunds = $pdo->query("SELECT total_funds FROM fund_bank WHERE id = 1")->fetc
           <br><span class="task-meta"><?= htmlspecialchars($task['assigned_to']) ?></span>
           <?php
             if (!empty($task['start_time']) && !empty($task['submission_time'])) {
-              $timeTaken = round((strtotime($task['submission_time']) - strtotime($task['start_time'])) / 60);
-              echo "<br><span class=\"task-meta\">{$timeTaken} min vs {$task['estimated_minutes']} min est</span>";
+              $timeTakenMin = (strtotime($task['submission_time']) - strtotime($task['start_time'])) / 60;
+              $timeTaken = formatDuration($timeTakenMin);
+              $estTime = formatDuration($task['estimated_minutes']);
+              echo "<br><span class=\"task-meta\">{$timeTaken} vs {$estTime} est</span>";
             }
           ?>
         <?php endif; ?>
