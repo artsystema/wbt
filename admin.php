@@ -109,7 +109,7 @@ foreach ($pending as &$p) {
 unset($p);
 
 // Get all tasks except those pending review (for listing + edit/delete)
-$stmt = $pdo->query("SELECT * FROM tasks WHERE status != 'pending_review' ORDER BY date_posted DESC");
+$stmt = $pdo->query("SELECT * FROM tasks WHERE status != 'pending_review' ORDER BY pinned DESC, date_posted DESC");
 $tasks = $stmt->fetchAll();
 
 // Stats for top bar
@@ -166,8 +166,8 @@ function formatDuration($minutes) {
   <p>No tasks awaiting review.</p>
 <?php else: ?>
   <?php foreach ($pending as $task): ?>
-    <div class="task review-task pending_review">
-      <div><strong><?= htmlspecialchars($task['title']) ?></strong></div>
+      <div class="task review-task pending_review">
+        <div><strong><?= $task['pinned'] ? '📌 ' : '' ?><?= htmlspecialchars($task['title']) ?></strong></div>
       <div>
         <?= htmlspecialchars($task['assigned_to']) ?><br>
         <span class="task-meta"><?= $task['submitted_at'] ?></span>
@@ -211,9 +211,9 @@ function formatDuration($minutes) {
   <div><button type="submit">Add Task</button></div>
 </form>
   <?php foreach ($tasks as $task): ?>
-  <?php if ($task['status'] === 'completed'): ?>
+    <?php if ($task['status'] === 'completed'): ?>
     <div class="task <?= $task['status'] ?>">
-      <div><strong><?= htmlspecialchars($task['title']) ?></strong>
+      <div><strong><?= $task['pinned'] ? '📌 ' : '' ?><?= htmlspecialchars($task['title']) ?></strong>
         <form action="/api/admin_tasks.php" method="POST" style="display:inline;">
           <input type="hidden" name="action" value="delete">
           <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
@@ -270,7 +270,7 @@ function formatDuration($minutes) {
     <form class="task edit <?= $task['status'] ?>" action="/api/admin_tasks.php" method="POST" enctype="multipart/form-data" id="edit-<?= $task['id'] ?>">
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
-      <div><input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>" required></div>
+      <div><?= $task['pinned'] ? '📌 ' : '' ?><input type="text" name="title" value="<?= htmlspecialchars($task['title']) ?>" required></div>
       <div>
         <textarea name="description" rows="2"><?= htmlspecialchars($task['description']) ?></textarea>
         <?php if (!empty($task['quit_comment'])): ?>
@@ -305,8 +305,8 @@ function formatDuration($minutes) {
       <div><input type="text" name="category" value="<?= htmlspecialchars($task['category'] ?? '') ?>"></div>
       <div><input type="number" step="0.01" name="reward" value="<?= $task['reward'] ?>"></div>
       <div><input type="number" name="minutes" value="<?= $task['estimated_minutes'] ?>"></div>
-      <div>
-        <?php if ($task['status'] === 'in_progress' && !empty($task['start_time'])): ?>
+        <div>
+          <?php if ($task['status'] === 'in_progress' && !empty($task['start_time'])): ?>
           <?php
             $endTs = strtotime($task['start_time']) + ($task['estimated_minutes'] * 60);
             $endIso = gmdate('c', $endTs);
@@ -318,19 +318,24 @@ function formatDuration($minutes) {
         <?php if (!empty($task['assigned_to'])): ?>
           <br><span class="task-meta"><?= htmlspecialchars($task['assigned_to']) ?></span>
         <?php endif; ?>
-      </div>
-      <div>
-        <button type="submit">Save</button>
-        <?php if ($task['status'] === 'archived'): ?>
-          <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="unarchive">Unarchive</button>
-        <?php else: ?>
-          <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="archive">Archive</button>
-        <?php endif; ?>
-        <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="delete" onclick="return confirm('Delete this task?')">Delete</button>
-      </div>
-    </form>
-    <?= $extraForms ?>
-  <?php endif; ?>
+        </div>
+        <div>
+          <button type="submit">Save</button>
+          <?php if ($task['status'] === 'archived'): ?>
+            <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="unarchive">Unarchive</button>
+          <?php else: ?>
+            <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="archive">Archive</button>
+          <?php endif; ?>
+          <?php if ($task['pinned']): ?>
+            <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="unpin">Unpin</button>
+          <?php else: ?>
+            <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="pin">Pin</button>
+          <?php endif; ?>
+          <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="delete" onclick="return confirm('Delete this task?')">Delete</button>
+        </div>
+      </form>
+      <?= $extraForms ?>
+    <?php endif; ?>
 <?php endforeach; ?>
 
 <footer>

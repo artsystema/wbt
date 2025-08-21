@@ -82,6 +82,16 @@ switch ($action) {
     $stmt = $pdo->prepare("UPDATE tasks SET status = 'available' WHERE id = ?");
     $stmt->execute([$taskId]);
     break;
+
+  case 'pin':
+    $stmt = $pdo->prepare("UPDATE tasks SET pinned = 1 WHERE id = ?");
+    $stmt->execute([$taskId]);
+    break;
+
+  case 'unpin':
+    $stmt = $pdo->prepare("UPDATE tasks SET pinned = 0 WHERE id = ?");
+    $stmt->execute([$taskId]);
+    break;
 }
 
 header("Location: /admin.php");

@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     div.innerHTML = `
 
           <div>
-            <div><strong><a href="task.php?id=${task.id}">[${task.id}] ${task.title}</a></strong></div>
+            <div><strong>${task.pinned ? '<span class="pinned-icon" title="Pinned">📌</span>' : ''}<a href="task.php?id=${task.id}">[${task.id}] ${task.title}</a></strong></div>
             <div class="task-meta">Posted on ${new Date(task.date_posted).toLocaleString()}</div>
             ${catSpans}
           </div>

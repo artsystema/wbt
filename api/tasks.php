@@ -15,13 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $taskId   = intval($_GET['id'] ?? 0);
 
     if ($taskId) {
-        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category, pinned FROM tasks WHERE id = ?");
         $stmt->execute([$taskId]);
     } elseif ($passcode) {
-        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks WHERE last_rejected IS NULL OR last_rejected != ? ORDER BY date_posted DESC");
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category, pinned FROM tasks WHERE last_rejected IS NULL OR last_rejected != ? ORDER BY pinned DESC, date_posted DESC");
         $stmt->execute([$passcode]);
     } else {
-        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category FROM tasks ORDER BY date_posted DESC");
+        $stmt = $pdo->prepare("SELECT id, title, description, links, attachments, reward, estimated_minutes, date_posted, status, assigned_to, start_time, submission_time, category, pinned FROM tasks ORDER BY pinned DESC, date_posted DESC");
         $stmt->execute();
     }
     $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);

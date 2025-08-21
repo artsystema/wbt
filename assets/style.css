@@ -112,6 +112,9 @@ span > strong:hover {
 .task > div:last-child {
     line-height: 2;
 }
+.pinned-icon {
+    margin-right: 4px;
+}
 .task.pending_review > div:last-child {
     line-height: normal;
     font-size: 11px;
