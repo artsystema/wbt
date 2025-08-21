@@ -17,7 +17,7 @@ CREATE TABLE tasks (
   reward DECIMAL(10,2),
   estimated_minutes INT,
   date_posted DATETIME DEFAULT CURRENT_TIMESTAMP,
-  status ENUM('available', 'in_progress', 'pending_review', 'completed') DEFAULT 'available',
+  status ENUM('available', 'in_progress', 'pending_review', 'completed', 'archived') DEFAULT 'available',
   assigned_to VARCHAR(255),
   start_time DATETIME,
   submission_time DATETIME,
