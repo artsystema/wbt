@@ -725,6 +725,30 @@ textarea {
         height: auto;
     }
 
+    /* Mobile input zoom prevention */
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="email"],
+    textarea,
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    /* Mobile-specific input styling */
+    input, textarea, select {
+        -webkit-appearance: none;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
     .preview-container audio {
         width: 100%;
         max-width: 300px;

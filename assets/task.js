@@ -133,4 +133,30 @@ document.addEventListener("DOMContentLoaded", () => {
             const reserved = bank.reserved > 0 ? ` ($${bank.reserved} reserved)` : '';
             bankDisplay.textContent = text + reserved;
         });
+
+    // Mobile-friendly enhancements for task page
+    function addMobileEnhancements() {
+        // Add tap highlighting removal for better mobile UX
+        if ('ontouchstart' in window) {
+            document.body.style.webkitTapHighlightColor = 'transparent';
+            
+            // Improve mobile form focus behavior
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    // Small delay to ensure viewport adjustment
+                    setTimeout(() => {
+                        if (input.scrollIntoViewIfNeeded) {
+                            input.scrollIntoViewIfNeeded();
+                        } else {
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 300);
+                });
+            });
+        }
+    }
+
+    // Initialize mobile enhancements
+    addMobileEnhancements();
 });
