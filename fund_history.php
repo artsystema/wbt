@@ -7,6 +7,8 @@ $transactions = $stmt->fetchAll();
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fund History</title>
     <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
 </head>
@@ -16,10 +18,10 @@ $transactions = $stmt->fetchAll();
 <tr><th>Date</th><th>Type</th><th>Amount</th><th>Description</th></tr>
 <?php foreach ($transactions as $t): ?>
 <tr>
-  <td><?= $t['created_at'] ?></td>
-  <td><?= htmlspecialchars($t['txn_type']) ?></td>
-  <td>$<?= number_format($t['amount'], 2) ?></td>
-  <td><?= htmlspecialchars($t['description'] ?? '') ?></td>
+  <td data-label="Date"><?= $t['created_at'] ?></td>
+  <td data-label="Type"><?= htmlspecialchars($t['txn_type']) ?></td>
+  <td data-label="Amount">$<?= number_format($t['amount'], 2) ?></td>
+  <td data-label="Description"><?= htmlspecialchars($t['description'] ?? '') ?></td>
 </tr>
 <?php endforeach; ?>
 </table>

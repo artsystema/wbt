@@ -28,6 +28,8 @@ if (is_dir($dir)) {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>[<?= htmlspecialchars($task['id']) ?>] <?= htmlspecialchars($task['title']) ?></title>
     <script src="assets/task.js?v=<?= time() ?>" defer></script>
     <link rel="stylesheet" href="assets/style.css?v=<?= time() ?>">
