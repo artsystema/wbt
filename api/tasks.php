@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($tasks as &$task) {
+        $task['pinned'] = (int)$task['pinned'];
         $dir = __DIR__ . '/../uploads/' . $task['id'] . '/in';
         $attachments = [];
         if (is_dir($dir)) {
