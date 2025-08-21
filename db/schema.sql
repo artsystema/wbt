@@ -14,6 +14,7 @@ CREATE TABLE tasks (
   links TEXT,
   category VARCHAR(255),
   attachments TEXT,
+  pinned TINYINT(1) DEFAULT 0,
   reward DECIMAL(10,2),
   estimated_minutes INT,
   date_posted DATETIME DEFAULT CURRENT_TIMESTAMP,

@@ -7,7 +7,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT id, title, description, reward, estimated_minutes, date_posted, status, assigned_to, category, start_time FROM tasks WHERE id = ?");
+$stmt = $pdo->prepare("SELECT id, title, description, reward, estimated_minutes, date_posted, status, assigned_to, category, start_time, pinned FROM tasks WHERE id = ?");
 $stmt->execute([$id]);
 $task = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$task) {
@@ -62,7 +62,7 @@ if (is_dir($dir)) {
     </div>
     <div id="taskRow" class="task <?= htmlspecialchars($task['status']) ?>" data-id="<?= $task['id'] ?>" data-owner="<?= htmlspecialchars($task['assigned_to'] ?? '') ?>" data-status="<?= htmlspecialchars($task['status']) ?>" data-start="<?= htmlspecialchars($task['start_time'] ? gmdate('c', strtotime($task['start_time'])) : '') ?>" data-estimated-ms="<?= $task['estimated_minutes'] * 60000 ?>">
         <div>
-            <div><strong>[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></strong></div>
+            <div><strong><?= $task['pinned'] ? '📌 ' : '' ?>[<?= $task['id'] ?>] <?= htmlspecialchars($task['title']) ?></strong></div>
             <div class="task-meta">Posted on <?= $task['date_posted'] ?></div>
             <span class="task-category"><?= htmlspecialchars($task['category'] ?? '') ?></span>
         </div>
