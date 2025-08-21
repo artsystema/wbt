@@ -635,10 +635,145 @@ textarea {
         background-color: #f1f8e9;
     }
 
-    .task.archived {
-        border-left: 4px solid #999;
+    /* Mobile-specific table styles */
+    .admin table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        margin-top: 20px;
+    }
+
+    .admin table th,
+    .admin table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ddd;
+        word-break: break-word;
+    }
+
+    .admin table th {
         background-color: #f5f5f5;
-        opacity: 0.8;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .admin table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .admin h3 {
+        margin: 80px 12px 20px 12px;
+        font-size: 1.2em;
+    }
+
+    /* Responsive table for very small screens */
+    /* Mobile attachments and previews */
+    .attachments {
+        margin-top: 8px;
+        padding: 8px;
+        border-radius: 4px;
+        background: #f9f9f9;
+        border: 1px dashed #ccc;
+    }
+
+    .attachments ul {
+        margin: 4px 0;
+        padding-left: 0;
+        list-style: none;
+    }
+
+    .attachments li {
+        margin-bottom: 8px;
+        padding: 4px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .attachments li:last-child {
+        border-bottom: none;
+    }
+
+    .preview-toggle {
+        padding: 4px 8px;
+        font-size: 12px;
+        min-height: auto;
+        margin: 0 0 0 8px;
+        background: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+
+    .preview-container {
+        margin-top: 8px;
+        padding: 8px;
+        border-radius: 4px;
+        background: #fafafa;
+        border: 1px solid #ddd;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .preview-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    .preview-container video {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .preview-container audio {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Responsive table for very small screens */
+    @media (max-width: 480px) {
+        .admin table,
+        .admin table thead,
+        .admin table tbody,
+        .admin table th,
+        .admin table td,
+        .admin table tr {
+            display: block;
+        }
+
+        .admin table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .admin table tr {
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            background: white;
+        }
+
+        .admin table td {
+            border: none;
+            position: relative;
+            padding: 8px 8px 8px 35%;
+            white-space: normal;
+            text-align: left;
+        }
+
+        .admin table td:before {
+            content: attr(data-label) ": ";
+            position: absolute;
+            left: 8px;
+            width: 30%;
+            padding-right: 10px;
+            white-space: nowrap;
+            text-align: left;
+            font-weight: bold;
+            color: #666;
+        }
     }
 }
 
