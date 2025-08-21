@@ -72,6 +72,16 @@ switch ($action) {
     $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ?");
     $stmt->execute([$taskId]);
     break;
+
+  case 'archive':
+    $stmt = $pdo->prepare("UPDATE tasks SET status = 'archived', assigned_to = NULL, start_time = NULL WHERE id = ?");
+    $stmt->execute([$taskId]);
+    break;
+
+  case 'unarchive':
+    $stmt = $pdo->prepare("UPDATE tasks SET status = 'available' WHERE id = ?");
+    $stmt->execute([$taskId]);
+    break;
 }
 
 header("Location: /admin.php");

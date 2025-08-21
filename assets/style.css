@@ -128,6 +128,10 @@ span > strong:hover {
 .task.completed {
     background-color: palegreen;
 }
+.task.archived {
+    background-color: #d3d3d3;
+    color: #555;
+}
 .pending_review > div {
     opacity: 1;
 }

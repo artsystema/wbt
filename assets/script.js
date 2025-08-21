@@ -408,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     }
 
-                    if (div.classList.contains('completed')) {
+                    if (div.classList.contains('completed') || div.classList.contains('archived')) {
                         taskListCompleted.appendChild(div);
                         taskListCompleted.style.display = "block";
                     } else {

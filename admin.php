@@ -321,6 +321,11 @@ function formatDuration($minutes) {
       </div>
       <div>
         <button type="submit">Save</button>
+        <?php if ($task['status'] === 'archived'): ?>
+          <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="unarchive">Unarchive</button>
+        <?php else: ?>
+          <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="archive">Archive</button>
+        <?php endif; ?>
         <button type="submit" formaction="/api/admin_tasks.php" formmethod="POST" name="action" value="delete" onclick="return confirm('Delete this task?')">Delete</button>
       </div>
     </form>
