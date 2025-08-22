@@ -6,6 +6,7 @@ if (!($_SESSION['admin_logged_in'] ?? false)) {
     exit;
 }
 require_once __DIR__ . '/../db/db.php';
+$mailConfig = require __DIR__ . '/../config.php';
 date_default_timezone_set('UTC');
 
 $taskId = intval($_POST['task_id'] ?? 0);
@@ -67,6 +68,20 @@ $stmt = $pdo->prepare("INSERT INTO payouts (passcode, amount, paid_at) VALUES (?
 $stmt->execute([$passcode, $total]);
 
 $pdo->commit();
+
+// Notify worker via email
+$stmt = $pdo->prepare("SELECT email FROM users WHERE passcode = ?");
+$stmt->execute([$passcode]);
+$userEmail = $stmt->fetchColumn();
+if ($userEmail) {
+    $subject = "Task #$taskId Approved";
+    $message = "Your submission for task #$taskId has been approved. Payout: $$total.";
+    $headers = 'From: ' . ($mailConfig['smtp_from'] ?? 'no-reply@example.com');
+    if (!empty($mailConfig['smtp_host'])) {
+        ini_set('SMTP', $mailConfig['smtp_host']);
+    }
+    mail($userEmail, $subject, $message, $headers);
+}
 
 header("Location: /admin.php");
 exit;

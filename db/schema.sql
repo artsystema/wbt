@@ -4,6 +4,7 @@ USE task_tracker;
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   passcode VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255),
   note TEXT
 );
 

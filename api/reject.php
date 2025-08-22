@@ -6,6 +6,7 @@ if (!($_SESSION['admin_logged_in'] ?? false)) {
     exit;
 }
 require_once __DIR__ . '/../db/db.php';
+$mailConfig = require __DIR__ . '/../config.php';
 
 $taskId = intval($_POST['task_id'] ?? 0);
 if (!$taskId) {
@@ -28,6 +29,22 @@ $stmt->execute([$rejectedUser, $taskId]);
 // Optional: delete submission record
 $stmt = $pdo->prepare("DELETE FROM submissions WHERE task_id = ?");
 $stmt->execute([$taskId]);
+
+// Notify worker via email
+if ($rejectedUser) {
+    $stmt = $pdo->prepare("SELECT email FROM users WHERE passcode = ?");
+    $stmt->execute([$rejectedUser]);
+    $userEmail = $stmt->fetchColumn();
+    if ($userEmail) {
+        $subject = "Task #$taskId Rejected";
+        $message = "Your submission for task #$taskId has been rejected. Payout: $0.";
+        $headers = 'From: ' . ($mailConfig['smtp_from'] ?? 'no-reply@example.com');
+        if (!empty($mailConfig['smtp_host'])) {
+            ini_set('SMTP', $mailConfig['smtp_host']);
+        }
+        mail($userEmail, $subject, $message, $headers);
+    }
+}
 
 header("Location: /admin.php");
 exit;
