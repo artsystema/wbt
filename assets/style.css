@@ -630,6 +630,29 @@ textarea {
     footer {
         padding: 12px 8px;
         margin-top: 24px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .theme-toggle {
+        margin-left: 0;
+        gap: 6px;
+    }
+
+    .theme-switch {
+        width: 40px;
+        height: 22px;
+    }
+
+    .theme-slider:before {
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+    }
+
+    input:checked + .theme-slider:before {
+        transform: translateX(18px);
     }
 
     /* Mobile login container */
