@@ -38,6 +38,13 @@
     <a href="https://github.com/artsystema/wbt" target="_blank">
       <img src="assets/icons/github.svg" alt="GitHub">
     </a>
+    <div class="theme-toggle">
+      <span class="theme-toggle-label">Dark Mode</span>
+      <label class="theme-switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="theme-slider"></span>
+      </label>
+    </div>
   </footer>
 
 </body>
