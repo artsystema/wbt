@@ -17,7 +17,7 @@
     --bg-progress-stripe: navy;
     --bg-progress-bar: #e0e0e0;
     --bg-preview: #fafafa;
-    --bg-attachments: #f9f9f9;
+    --bg-attachments: #edecec;
     --bg-table-header: #f5f5f5;
     --bg-table-even: #f9f9f9;
     --bg-filter: #eee;
@@ -303,7 +303,6 @@ textarea {
     margin-top: 8px;
     position: relative;
     display: block;
-    background: #ffffff7d;
 }
 .attachments ul {
     padding-left: 0;
