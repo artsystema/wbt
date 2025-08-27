@@ -627,10 +627,10 @@ textarea {
 
     /* Mobile footer */
     footer {
-        padding: 12px 8px;
+        padding: 8px;
         margin-top: 24px;
         flex-direction: column;
-        gap: 8px;
+        gap: 6px;
     }
 
     .theme-toggle {
@@ -639,19 +639,19 @@ textarea {
     }
 
     .theme-switch {
-        width: 40px;
-        height: 22px;
+        width: 28px;
+        height: 15px;
     }
 
     .theme-slider:before {
-        height: 16px;
-        width: 16px;
-        left: 2px;
-        bottom: 2px;
+        height: 11px;
+        width: 11px;
+        left: 1px;
+        bottom: 1px;
     }
 
     input:checked + .theme-slider:before {
-        transform: translateX(18px);
+        transform: translateX(12px);
     }
 
     /* Mobile login container */
@@ -920,13 +920,13 @@ textarea {
 /* ===== Footer ===== */
 footer {
     text-align: center;
-    padding: 10px;
+    padding: 6px;
     font-size: 0.9em;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 6px;
     transition: color 0.3s ease;
 }
 footer img {
@@ -936,18 +936,23 @@ footer img {
     margin-left: 4px;
 }
 
+/* Make GitHub icon visible in dark mode */
+.dark-theme footer img {
+    filter: invert(1) brightness(0.8);
+}
+
 /* Dark mode toggle switch */
 .theme-toggle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-left: 15px;
+    gap: 6px;
+    margin-left: 10px;
 }
 
 .theme-switch {
     position: relative;
-    width: 44px;
-    height: 24px;
+    width: 31px;
+    height: 17px;
 }
 
 .theme-switch input {
@@ -972,10 +977,10 @@ footer img {
 .theme-slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    left: 2px;
-    bottom: 2px;
+    height: 13px;
+    width: 13px;
+    left: 1px;
+    bottom: 1px;
     background-color: var(--text-primary);
     transition: 0.3s;
     border-radius: 50%;
@@ -986,11 +991,11 @@ input:checked + .theme-slider {
 }
 
 input:checked + .theme-slider:before {
-    transform: translateX(20px);
+    transform: translateX(14px);
 }
 
 .theme-toggle-label {
-    font-size: 0.85em;
+    font-size: 0.9em;
     color: var(--text-secondary);
     cursor: pointer;
 }
